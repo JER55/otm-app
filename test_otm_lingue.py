@@ -224,7 +224,7 @@ class TestShell(unittest.TestCase):
         html = self._html("en")
         blob = re.search(r'<script type="application/json" id="v-footprint">(.*?)</script>', html, re.S).group(1)
         vista = json.loads(blob)
-        self.assertIn("height:49px;min-height:49px;flex:0 0 49px;box-sizing:border-box;padding:0 18px;", vista)
+        self.assertIn("height:43px;min-height:43px;flex:0 0 43px;box-sizing:border-box;padding:6px 14px;", vista)
         self.assertNotIn('id="kiyo-fp-refresh"', vista)
         self.assertNotIn('id="kiyo-fp-close"', vista)
         self.assertNotIn("querySelector('#kiyo-fp-refresh')", vista)

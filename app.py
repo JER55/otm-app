@@ -918,8 +918,8 @@ _PATCHES = {
     )],
     "footprint": [(
         "#kiyo-fp-head{display:flex;align-items:center;gap:0;padding:11px 16px;",
-        "#kiyo-fp-head{display:flex;align-items:center;gap:0;height:49px;min-height:49px;"
-        "flex:0 0 49px;box-sizing:border-box;padding:0 18px;",
+        "#kiyo-fp-head{display:flex;align-items:center;gap:0;height:43px;min-height:43px;"
+        "flex:0 0 43px;box-sizing:border-box;padding:6px 14px;",
     )],
 }
 
@@ -931,7 +931,7 @@ def _inject(html: str, nav_js: str, name: str = "") -> str:
     for vecchio, nuovo in _PATCHES.get(name, []):
         if vecchio in html:
             html = html.replace(vecchio, nuovo)
-        else:
+        elif nuovo not in html:
             st.warning(tr("Correzione non applicata alla vista {nome}: riga non trovata.", nome=name))
     if name == "footprint":
         html, pulsanti = re.subn(
@@ -944,7 +944,7 @@ def _inject(html: str, nav_js: str, name: str = "") -> str:
             "",
             html,
         )
-        if pulsanti != 2 or listener != 2:
+        if pulsanti not in (0, 2) or listener not in (0, 2):
             st.warning(tr("Correzione non applicata alla vista {nome}: riga non trovata.", nome=name))
     head = _i18n_head() + _SHIM + "<script>\n" + nav_js + "\n</script>"
     i = html.lower().find("<head>")
