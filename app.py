@@ -792,13 +792,13 @@ html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stVerticalBlock"] {{ gap:0 !important; }}
 [data-testid="stElementContainer"]:has(iframe[height="0"]) {{ display:none; }}
 .otm-brand {{ display:flex; flex-direction:column; align-items:center; gap:14px; }}
-.otm-brand svg {{ width:64px; height:64px; filter:drop-shadow(0 0 22px rgba(61,212,200,.35)); }}
-.otm-brand b {{ font-family:'Inter',sans-serif; font-weight:700; font-size:1.6rem;
-               letter-spacing:.06em; color:{LIGHT}; }}
-.otm-brand b span {{ background:linear-gradient(90deg,{TEAL},{SKY}); -webkit-background-clip:text;
+.otm-brand svg {{ width:68px; height:68px; filter:drop-shadow(0 0 18px rgba(29,184,225,.28)) drop-shadow(0 0 20px rgba(242,190,46,.14)); }}
+.otm-brand b {{ font-family:'Inter',sans-serif; font-weight:800; font-size:1.7rem;
+               letter-spacing:.055em; color:#F5F7FB; }}
+.otm-brand b span {{ background:linear-gradient(100deg,#FFF44F,#FFD21C 68%,#F2A93B); -webkit-background-clip:text;
                     background-clip:text; color:transparent; }}
 .otm-brand small {{ font-family:'Inter',sans-serif; font-size:.68rem; letter-spacing:.42em;
-                   color:{MUTED}; margin-top:-8px; }}
+                   color:#8FA9C7; margin-top:-8px; }}
 iframe {{ border:1px solid {ELEVATED} !important; border-radius:10px; background:#050a12; display:block; }}
 </style>
 """,
@@ -1077,16 +1077,16 @@ SHELL_HTML = r"""<!doctype html>
   @keyframes sweep{0%{transform:translateX(-110%)}60%,100%{transform:translateX(370%)}}
 
   .brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;text-decoration:none;color:inherit;user-select:none;padding:0 5px 0 0}
-  .brand svg{width:34px;height:34px;display:block;padding:3px;border:1px solid rgba(61,212,200,.16);border-radius:10px;
-    background:linear-gradient(145deg,rgba(61,212,200,.08),rgba(111,168,255,.035));filter:drop-shadow(0 2px 7px rgba(0,0,0,.3));
+  .brand svg{width:36px;height:36px;display:block;padding:3px;border:1px solid rgba(69,174,222,.25);border-radius:11px;
+    background:linear-gradient(145deg,rgba(21,143,195,.13),rgba(242,190,46,.055));filter:drop-shadow(0 2px 8px rgba(0,0,0,.32));
     transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .2s}
-  .brand:hover svg{transform:translateY(-1px) scale(1.04);border-color:rgba(61,212,200,.42)}
+  .brand:hover svg{transform:translateY(-1px) scale(1.04);border-color:rgba(242,190,46,.48)}
   .brand .otm-dot{transform-origin:24.5px 7.5px;animation:breakout 3.2s ease-in-out infinite}
   @keyframes breakout{0%,100%{transform:translate(0,0);opacity:1}45%{transform:translate(1.1px,-1.1px);opacity:1}55%{opacity:.55}}
   .wm{display:flex;flex-direction:column;line-height:1}
-  .wm b{font:800 15px/1 'Inter',sans-serif;letter-spacing:.055em;color:var(--light)}
-  .wm b span{background:linear-gradient(90deg,var(--teal),var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .wm small{margin-top:5px;font:600 7px/1 'Inter',sans-serif;letter-spacing:.31em;color:#71829d;white-space:nowrap}
+  .wm b{font:800 15px/1 'Inter',sans-serif;letter-spacing:.06em;color:#F5F7FB}
+  .wm b span{background:linear-gradient(100deg,#FFF44F,#FFD21C 68%,#F2A93B);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .wm small{margin-top:5px;font:600 7px/1 'Inter',sans-serif;letter-spacing:.31em;color:#8FA9C7;white-space:nowrap}
   .sep{width:1px;height:27px;background:linear-gradient(180deg,transparent,var(--line-hi),transparent);flex:0 0 1px}
 
   nav{position:relative;display:flex;gap:2px;background:rgba(3,9,18,.44);border:1px solid var(--line-hi);border-radius:11px;padding:3px;
