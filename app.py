@@ -1,16 +1,17 @@
 """
 OUTTHINK THE MARKET — shell Streamlit
 --------------------------------------
-Incorpora le due app JS (Footprint e FakeMove E/L/C). Rendering e websocket
+Incorpora le due app JS (FakeMove E/L/C e Footprint). Rendering e websocket
 restano nel browser: i dati arrivano dal tuo IP (Italia), non dal server
 Streamlit (USA, bloccato da Binance/Bybit).
 
 Struttura lato browser:
   componente Streamlit  ->  shell (barra, tab, orologio sessione USA, fullscreen)
-                              ├─ iframe Footprint   (sempre vivo dopo la prima apertura)
-                              └─ iframe FakeMove    (idem)
-Il cambio vista e' istantaneo: la vista in background continua a ricevere i dati
-ma non disegna (window.__OTM_SUSPENDED), quindi non consuma CPU di rendering.
+                              ├─ iframe FakeMove    (vista iniziale)
+                              └─ iframe Footprint   (precaricato in background, sospeso)
+Il cambio vista e' istantaneo: entrambe le viste sono vive; quella in background
+riceve i dati ma non disegna (window.__OTM_SUSPENDED, impostato PRIMA che i suoi
+script partano), quindi non consuma CPU di rendering.
 
 Adattamenti applicati qui al caricamento delle viste:
   1. session-volume-profile.js inserito inline nella Footprint
@@ -19,6 +20,7 @@ Adattamenti applicati qui al caricamento delle viste:
   4. in cloud le chiamate di esecuzione (proxy/Netlify) vengono bloccate
 """
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -52,11 +54,13 @@ st.markdown(
 html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stHeader"], [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] {{ display:none; }}
 #MainMenu, footer, [data-testid="stToolbar"] {{ visibility:hidden; }}
-.block-container {{ padding:0.5rem 0.6rem 0 0.6rem !important; max-width:100% !important; }}
+.block-container {{ padding:0.25rem 0.4rem 0 0.4rem !important; max-width:100% !important; }}
+[data-testid="stMainBlockContainer"] {{ padding-top:0.25rem !important; }}
+[data-testid="stVerticalBlock"] {{ gap:0 !important; }}
 .otm-brand {{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem;
              letter-spacing:.08em; color:{LIGHT}; }}
 .otm-brand span {{ color:{TEAL}; }}
-iframe {{ border:1px solid {ELEVATED} !important; border-radius:12px; background:#050a12; display:block; }}
+iframe {{ border:1px solid {ELEVATED} !important; border-radius:10px; background:#050a12; display:block; }}
 </style>
 """,
     unsafe_allow_html=True,
@@ -185,7 +189,8 @@ def _blob(html: str) -> str:
 
 
 @st.cache_data(show_spinner=False, ttl=900)
-def _build_shell(_key: float, local: bool) -> str:
+def _build_shell(_key: float, local: bool, _shell_ver: str) -> str:
+    # _shell_ver = hash di SHELL_HTML: se modifichi la shell la cache si invalida subito
     return (SHELL_HTML
             .replace("%%LOCAL%%", "true" if local else "false")
             .replace("%%FP%%", _blob(_build_view("footprint")))
@@ -196,8 +201,9 @@ def load_shell(local: bool) -> str:
     # in locale la cache si invalida quando cambi un file; da remoto vale il ttl di 15 minuti
     files = {f for fs in VIEW_FILES.values() for f in fs}
     key = max((VIEWS / f).stat().st_mtime for f in files) if LOCAL_VIEWS else 0.0
+    ver = hashlib.sha1(SHELL_HTML.encode()).hexdigest()[:12]
     try:
-        return _build_shell(key, local)
+        return _build_shell(key, local, ver)
     except RuntimeError as e:
         st.error(f"Impossibile caricare le viste: {e}")
         st.stop()
@@ -209,39 +215,46 @@ SHELL_HTML = r"""<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#0B1220;--surf:#111C2E;--elev:#16233A;--teal:#3DD4C8;--muted:#8394B0;--light:#E8EEF9;--amber:#F2A93B;--red:#FF5C5C;}
+  :root{--ink:#0B1220;--surf:#111C2E;--elev:#16233A;--teal:#3DD4C8;--muted:#8394B0;--light:#E8EEF9;--amber:#F2A93B;--red:#FF5C5C;--hh:34px;}
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:#050a12;overflow:hidden;color:var(--light);font-family:Inter,system-ui,sans-serif}
   #shell{display:flex;flex-direction:column;height:100%}
-  header{height:46px;flex:0 0 46px;display:flex;align-items:center;gap:16px;padding:0 12px 0 14px;
+  header{height:var(--hh);flex:0 0 var(--hh);display:flex;align-items:center;gap:12px;padding:0 6px 0 10px;
     background:linear-gradient(180deg,#0f1828,#0b1220);border-bottom:1px solid var(--elev)}
-  .brand{font:700 14px 'Space Grotesk',sans-serif;letter-spacing:.1em;white-space:nowrap}
+  .brand{font:700 12px 'Space Grotesk',sans-serif;letter-spacing:.1em;white-space:nowrap}
   .brand span{color:var(--teal)}
-  nav{position:relative;display:flex;background:#0a111d;border:1px solid var(--elev);border-radius:10px;padding:3px}
-  nav button{all:unset;cursor:pointer;position:relative;z-index:1;padding:6px 14px;border-radius:7px;
-    font:700 11.5px 'Space Grotesk',sans-serif;letter-spacing:.09em;color:var(--muted);transition:color .2s;white-space:nowrap}
+  nav{position:relative;display:flex;background:#0a111d;border:1px solid var(--elev);border-radius:8px;padding:2px}
+  nav button{all:unset;cursor:pointer;position:relative;z-index:1;padding:3px 11px;border-radius:6px;line-height:18px;
+    font:700 10.5px/18px 'Space Grotesk',sans-serif;letter-spacing:.09em;color:var(--muted);transition:color .15s;white-space:nowrap}
   nav button:hover{color:var(--light)}
+  nav button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
   nav button.on{color:#06110f}
-  nav button kbd{font:700 9.5px 'JetBrains Mono',monospace;margin-left:7px;opacity:.55}
-  nav .ink{position:absolute;top:3px;bottom:3px;left:3px;border-radius:7px;background:var(--teal);
-    box-shadow:0 0 18px rgba(61,212,200,.35);transition:transform .28s cubic-bezier(.2,.8,.2,1),width .28s cubic-bezier(.2,.8,.2,1)}
+  nav button kbd{font:700 9px 'JetBrains Mono',monospace;margin-left:6px;opacity:.5}
+  nav button .ld{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:6px;vertical-align:1px;background:currentColor;opacity:0;transition:opacity .2s}
+  nav button.loading .ld{opacity:.7;animation:blink .8s infinite}
+  @keyframes blink{50%{opacity:.15}}
+  nav .ink{position:absolute;top:2px;bottom:2px;left:0;border-radius:6px;background:var(--teal);
+    box-shadow:0 0 14px rgba(61,212,200,.3);transition:transform .22s cubic-bezier(.2,.8,.2,1),width .22s cubic-bezier(.2,.8,.2,1)}
+  nav.noanim .ink{transition:none}
   .sp{flex:1}
-  .chip{display:flex;align-items:center;gap:7px;font:600 11px Inter,sans-serif;color:var(--muted);white-space:nowrap}
-  .chip b{font:700 11.5px 'JetBrains Mono',monospace;color:var(--light);letter-spacing:.02em}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+  .chip{display:flex;align-items:center;gap:6px;font:600 10.5px Inter,sans-serif;color:var(--muted);white-space:nowrap}
+  .chip b{font:700 11px 'JetBrains Mono',monospace;color:var(--light);letter-spacing:.02em}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
   .dot.open{background:var(--teal);box-shadow:0 0 0 0 rgba(61,212,200,.6);animation:pulse 1.8s infinite}
   .dot.pre{background:var(--amber)}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,212,200,.55)}70%{box-shadow:0 0 0 7px rgba(61,212,200,0)}100%{box-shadow:0 0 0 0 rgba(61,212,200,0)}}
-  .pill{font:700 10.5px 'JetBrains Mono',monospace;padding:4px 10px;border-radius:999px;border:1px solid;white-space:nowrap;cursor:default}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,212,200,.55)}70%{box-shadow:0 0 0 6px rgba(61,212,200,0)}100%{box-shadow:0 0 0 0 rgba(61,212,200,0)}}
+  .pill{font:700 9.5px 'JetBrains Mono',monospace;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap;cursor:default}
   .pill.live{color:var(--red);border-color:rgba(255,92,92,.4);background:rgba(255,92,92,.08)}
   .pill.safe{color:var(--teal);border-color:rgba(61,212,200,.4);background:rgba(61,212,200,.08)}
-  .ib{all:unset;cursor:pointer;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--muted);
+  .ib{all:unset;cursor:pointer;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:var(--muted);
     border:1px solid transparent;transition:all .15s}
   .ib:hover{color:var(--light);background:rgba(61,212,200,.1);border-color:rgba(61,212,200,.25)}
-  .ib svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .ib svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   #stage{position:relative;flex:1;min-height:0;background:#050a12}
-  iframe.view{position:absolute;inset:0;width:100%;height:100%;border:0;visibility:hidden;opacity:0;transition:opacity .18s}
-  iframe.view.on{visibility:visible;opacity:1}
+  /* dissolvenza incrociata: la vista uscente resta visibile finche' non e' sfumata */
+  iframe.view{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .14s ease,visibility 0s linear .14s}
+  iframe.view.on{opacity:1;visibility:visible;pointer-events:auto;z-index:1;transition:opacity .14s ease,visibility 0s}
   #loader{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
   #loader.on{display:grid}
   #loader div{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.2em;color:var(--muted)}
@@ -249,15 +262,15 @@ SHELL_HTML = r"""<!doctype html>
     background-size:200% 100%;animation:sh 1.1s linear infinite}
   @keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
   @media (max-width:980px){.hide-m{display:none}}
-  @media (max-width:640px){.brand{display:none} nav button{padding:6px 9px} nav button kbd{display:none}}
+  @media (max-width:640px){.brand{display:none} nav button{padding:3px 8px} nav button kbd{display:none}}
 </style></head>
 <body><div id="shell">
   <header>
     <div class="brand">OTM <span>· ORDER FLOW</span></div>
-    <nav id="tabs">
+    <nav id="tabs" class="noanim" role="tablist">
       <i class="ink"></i>
-      <button data-v="footprint">FOOTPRINT<kbd>[</kbd></button>
-      <button data-v="fakemove">FAKEMOVE E/L/C<kbd>]</kbd></button>
+      <button role="tab" data-v="fakemove">FAKEMOVE E/L/C<i class="ld"></i><kbd>[</kbd></button>
+      <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd>]</kbd></button>
     </nav>
     <div class="sp"></div>
     <div class="chip hide-m" id="sess" title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)"><span class="dot" id="sdot"></span><span id="stxt">US</span></div>
@@ -268,26 +281,28 @@ SHELL_HTML = r"""<!doctype html>
   </header>
   <main id="stage"><div id="loader"><div>CARICAMENTO<i></i></div></div></main>
 </div>
-<script type="application/json" id="v-footprint">%%FP%%</script>
 <script type="application/json" id="v-fakemove">%%FM%%</script>
+<script type="application/json" id="v-footprint">%%FP%%</script>
 <script>
 (function () {
   var LOCAL = %%LOCAL%%;
-  var ORDER = ['footprint', 'fakemove'];
-  var V = { footprint: { f: null }, fakemove: { f: null } };
+  var START = 'fakemove';                      // vista mostrata all'apertura
+  var ORDER = ['fakemove', 'footprint'];
+  var V = { fakemove: { f: null, ready: false }, footprint: { f: null, ready: false } };
   var stage = document.getElementById('stage'), loader = document.getElementById('loader');
   var tabs = document.getElementById('tabs'), ink = tabs.querySelector('.ink');
-  var cur = null, pseudo = false;
-  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  var cur = null, pseudo = false, lastCycle = 0;
 
   var mode = document.getElementById('mode');
   mode.className = 'pill ' + (LOCAL ? 'live' : 'safe');
-  mode.textContent = LOCAL ? '● LOCALE · LIVE VIA PROXY' : '● CLOUD · SOLO ANALISI';
+  mode.textContent = LOCAL ? '● LOCALE · LIVE' : '● CLOUD · ANALISI';
   mode.title = LOCAL ? 'Ordini reali tramite local-bitget-proxy.js (tetto 0,1 BTC)' : 'Esecuzione disattivata: per operare usa l\'app in locale con il proxy';
 
   function win(n) { return V[n].f && V[n].f.contentWindow; }
   function nav(n) { var w = win(n); return w && w.OTMNav && w.OTMNav.instance; }
+  function btn(n) { return tabs.querySelector('button[data-v="' + n + '"]'); }
+  function editable(t) { return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
+
   function applySuspend() {
     ORDER.forEach(function (n) {
       var w = win(n); if (!w) return;
@@ -295,38 +310,74 @@ SHELL_HTML = r"""<!doctype html>
       if (!off) { var i = nav(n); if (i) i.resume(); }
     });
   }
+  function syncLoader() {
+    var busy = cur && V[cur].f && !V[cur].ready;
+    loader.classList.toggle('on', !!busy);
+    ORDER.forEach(function (n) { var b = btn(n); if (b) b.classList.toggle('loading', !!V[n].f && !V[n].ready); });
+  }
+  function focusView(n, delay) {
+    setTimeout(function () { if (cur === n) { try { V[n].f.contentWindow.focus(); } catch (e) {} } }, delay || 0);
+  }
+
   function frame(n) {
     if (V[n].f) return V[n].f;
     var f = document.createElement('iframe');
     f.className = 'view'; f.title = n;
     f.setAttribute('allow', 'fullscreen; clipboard-read; clipboard-write; autoplay');
     f.addEventListener('load', function () {
-      loader.classList.remove('on'); applySuspend();
+      V[n].ready = true; syncLoader(); applySuspend();
       var w = f.contentWindow;
-      try { w.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pseudo && !e.defaultPrevented) setPseudo(false); }); } catch (e) {}
-      if (n === cur) setTimeout(function () { try { w.focus(); } catch (e) {} }, 60);
+      try {
+        w.addEventListener('keydown', function (e) {
+          if (e.ctrlKey || e.metaKey || e.altKey || editable(e.target)) return;
+          if (e.key === 'Escape' && pseudo && !e.defaultPrevented) { setPseudo(false); return; }
+          // [ ] funzionano anche con il focus sul grafico
+          if (e.key === '[' || e.key === ']') { e.preventDefault(); cycle(e.key === ']' ? 1 : -1); }
+        });
+      } catch (e) {}
+      if (n === cur) focusView(n, 40);
     });
-    loader.classList.add('on');
-    f.srcdoc = JSON.parse(document.getElementById('v-' + n).textContent);
+    // la vista nasce gia' sospesa se non e' quella attiva: non disegna nemmeno al primo frame
+    var html = JSON.parse(document.getElementById('v-' + n).textContent);
+    if (n !== cur) {
+      var pre = '<script>window.__OTM_SUSPENDED=true;<\/script>';
+      var i = html.search(/<head[^>]*>/i);
+      html = i !== -1 ? html.replace(/<head[^>]*>/i, function (m) { return m + pre; }) : pre + html;
+    }
+    f.srcdoc = html;
     stage.appendChild(f); V[n].f = f;
+    syncLoader();
     return f;
   }
+
   function moveInk() {
     var b = tabs.querySelector('button.on'); if (!b) return;
     ink.style.width = b.offsetWidth + 'px';
-    ink.style.transform = 'translateX(' + (b.offsetLeft - 3) + 'px)';
+    ink.style.transform = 'translateX(' + b.offsetLeft + 'px)';
   }
   function show(n) {
-    if (!V[n]) n = 'footprint';
+    if (!V[n]) n = START;
     if (cur === n) return;
-    cur = n; lsSet('otm_view', n);
-    var f = frame(n);
+    cur = n;
+    frame(n);
     ORDER.forEach(function (k) { if (V[k].f) V[k].f.classList.toggle('on', k === n); });
-    tabs.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === n); });
-    moveInk(); applySuspend();
-    setTimeout(function () { try { f.contentWindow.focus(); } catch (e) {} }, 40);
+    tabs.querySelectorAll('button').forEach(function (b) {
+      var on = b.getAttribute('data-v') === n;
+      b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    moveInk(); applySuspend(); syncLoader();
+    if (V[n].ready) focusView(n, 30);
   }
-  function cycle(d) { var i = ORDER.indexOf(cur); show(ORDER[(i + d + ORDER.length) % ORDER.length]); }
+  function cycle(d) {
+    var t = Date.now(); if (t - lastCycle < 150) return;   // evita doppio scatto (shell + vista)
+    lastCycle = t;
+    var i = ORDER.indexOf(cur); show(ORDER[(i + d + ORDER.length) % ORDER.length]);
+  }
+
+  // precarica le altre viste quando il browser e' libero: il primo switch e' gia' istantaneo
+  function preload() {
+    ORDER.forEach(function (n) { if (!V[n].f) frame(n); });
+  }
 
   // ── schermo intero: API nativa, altrimenti "pseudo" (iframe a tutta pagina) ──
   function setPseudo(on) {
@@ -351,7 +402,7 @@ SHELL_HTML = r"""<!doctype html>
     var fe = window.frameElement; if (!fe || pseudo || document.fullscreenElement) return;
     try {
       var r = fe.getBoundingClientRect(), H = window.top.innerHeight;
-      var h = Math.max(480, Math.floor(H - r.top - 10));
+      var h = Math.max(480, Math.floor(H - r.top - 4));
       if (Math.abs((parseFloat(fe.style.height) || 0) - h) > 1) fe.style.height = h + 'px';
     } catch (e) {}
   }
@@ -382,19 +433,25 @@ SHELL_HTML = r"""<!doctype html>
   tick(); setInterval(tick, 1000);
 
   // ── input ──
-  tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(b.getAttribute('data-v')); });
+  // pointerdown invece di click: lo switch parte alla pressione, non al rilascio
+  tabs.addEventListener('pointerdown', function (e) { var b = e.target.closest('button'); if (b && e.button === 0) { e.preventDefault(); show(b.getAttribute('data-v')); } });
+  tabs.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { var b = e.target.closest('button'); if (b) { e.preventDefault(); show(b.getAttribute('data-v')); } } });
   document.getElementById('b-fs').addEventListener('click', fullscreen);
   document.getElementById('b-help').addEventListener('click', function () { var i = nav(cur); if (i) i.help(); });
   document.addEventListener('keydown', function (e) {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || editable(e.target)) return;
     if (e.key === '[' || e.key === ']') { e.preventDefault(); cycle(e.key === ']' ? 1 : -1); return; }
     if (e.key === 'Escape' && pseudo) { setPseudo(false); return; }
     var i = nav(cur); if (i) i.key(e);           // tasti premuti sulla barra: girati al grafico attivo
   });
   document.addEventListener('fullscreenchange', function () { setTimeout(fit, 50); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveInk);
 
   window.OTMShell = { show: show, cycle: cycle, fullscreen: fullscreen, exitPseudo: function () { if (pseudo) setPseudo(false); } };
-  show(lsGet('otm_view') || 'footprint');
+
+  show(START);
+  requestAnimationFrame(function () { moveInk(); requestAnimationFrame(function () { tabs.classList.remove('noanim'); }); });
+  (window.requestIdleCallback || function (cb) { return setTimeout(cb, 1200); })(preload, { timeout: 2500 });
 })();
 </script>
 </body></html>"""
