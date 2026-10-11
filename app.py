@@ -761,9 +761,21 @@ LOGO_FULL = (
     "r//2Q=="
 )
 OTM_MARK_SVG = (
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 134 128" width="32" height="32" aria-hidden="true">'
-    '<defs><clipPath id="otm-mark-clip"><rect x="0" y="0" width="134" height="128" rx="18"/></clipPath></defs>'
-    '<image href="' + LOGO_MARK + '" x="0" y="0" width="134" height="128" clip-path="url(#otm-mark-clip)" preserveAspectRatio="xMidYMid meet"/>'
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 164" width="32" height="32" aria-hidden="true">'
+    '<defs>'
+    '<clipPath id="otm-mark-clip"><rect x="30" y="30" width="104" height="104" rx="26"/></clipPath>'
+    '<filter id="otm-mark-glow" x="-40%" y="-40%" width="180%" height="180%">'
+    '<feGaussianBlur stdDeviation="4" result="blur"/>'
+    '<feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.22 0 0 0 0 0.78 0 0 0 0 1 0 0 0 .65 0" result="glow"/>'
+    '<feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>'
+    '</filter>'
+    '</defs>'
+    '<g class="otm-orbit-a"><circle cx="82" cy="82" r="79" fill="none" stroke="#59E1FF" stroke-opacity=".38"/>'
+    '<circle cx="82" cy="3" r="4" fill="#59E1FF" filter="url(#otm-mark-glow)"/></g>'
+    '<g class="otm-orbit-b"><circle cx="82" cy="82" r="67" fill="none" stroke="#9B7BFF" stroke-opacity=".4" stroke-dasharray="2 4"/>'
+    '<circle cx="82" cy="149" r="3" fill="#9B7BFF" filter="url(#otm-mark-glow)"/></g>'
+    '<rect x="30" y="30" width="104" height="104" rx="26" fill="#020406" stroke="#59E1FF" stroke-opacity=".3" filter="url(#otm-mark-glow)"/>'
+    '<image href="' + LOGO_MARK + '" x="30" y="30" width="104" height="104" clip-path="url(#otm-mark-clip)" preserveAspectRatio="xMidYMid meet"/>'
     '</svg>'
 )
 FAVICON_URL = "data:image/svg+xml," + urllib.parse.quote(OTM_MARK_SVG)
@@ -793,6 +805,11 @@ html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stElementContainer"]:has(iframe[height="0"]) {{ display:none; }}
 .otm-brand {{ display:flex; flex-direction:column; align-items:center; gap:14px; }}
 .otm-brand svg {{ width:68px; height:68px; filter:drop-shadow(0 0 18px rgba(29,184,225,.28)) drop-shadow(0 0 20px rgba(242,190,46,.14)); }}
+.otm-brand svg .otm-orbit-a {{ transform-origin:82px 82px; animation:otm-spin 14s linear infinite; }}
+.otm-brand svg .otm-orbit-b {{ transform-origin:82px 82px; animation:otm-spinr 22s linear infinite; }}
+@keyframes otm-spin {{ to {{ transform:rotate(360deg); }} }}
+@keyframes otm-spinr {{ to {{ transform:rotate(-360deg); }} }}
+@media (prefers-reduced-motion:reduce) {{ .otm-brand svg .otm-orbit-a,.otm-brand svg .otm-orbit-b {{ animation:none; }} }}
 .otm-brand b {{ font-family:'Inter',sans-serif; font-weight:800; font-size:1.7rem;
                letter-spacing:.055em; color:#F5F7FB; }}
 .otm-brand b span {{ background:linear-gradient(100deg,#FFF44F,#FFD21C 68%,#F2A93B); -webkit-background-clip:text;
@@ -1000,8 +1017,11 @@ def _blob(html: str) -> str:
 def _build_shell(_key: float, local: bool, shell_ver: str) -> str:
     # shell_ver = hash di SHELL_HTML + logo: fa parte della chiave della cache.
     _ = shell_ver
+    shell_mark = OTM_MARK_SVG.replace("otm-mark", "otm-shell-mark")
+    loader_mark = OTM_MARK_SVG.replace("otm-mark", "otm-loader-mark")
     return (SHELL_HTML
-            .replace("%%MARK%%", OTM_MARK_SVG)
+            .replace("%%MARK%%", shell_mark, 1)
+            .replace("%%MARK%%", loader_mark, 1)
             .replace("%%LOCAL%%", "true" if local else "false")
             .replace("%%FP%%", _blob(_build_view("footprint")))
             .replace("%%FM%%", _blob(_build_view("fakemove"))))
@@ -1077,10 +1097,13 @@ SHELL_HTML = r"""<!doctype html>
   @keyframes sweep{0%{transform:translateX(-110%)}60%,100%{transform:translateX(370%)}}
 
   .brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;text-decoration:none;color:inherit;user-select:none;padding:0 5px 0 0}
-  .brand svg{width:36px;height:36px;display:block;padding:3px;border:1px solid rgba(69,174,222,.25);border-radius:11px;
-    background:linear-gradient(145deg,rgba(21,143,195,.13),rgba(242,190,46,.055));filter:drop-shadow(0 2px 8px rgba(0,0,0,.32));
-    transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .2s}
-  .brand:hover svg{transform:translateY(-1px) scale(1.04);border-color:rgba(242,190,46,.48)}
+  .brand svg{width:40px;height:40px;display:block;overflow:visible;filter:drop-shadow(0 2px 8px rgba(0,0,0,.32));
+    transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .brand:hover svg{transform:translateY(-1px) scale(1.04)}
+  .brand svg .otm-orbit-a{transform-origin:82px 82px;animation:otm-spin 14s linear infinite}
+  .brand svg .otm-orbit-b{transform-origin:82px 82px;animation:otm-spinr 22s linear infinite}
+  @keyframes otm-spin{to{transform:rotate(360deg)}}
+  @keyframes otm-spinr{to{transform:rotate(-360deg)}}
   .brand .otm-dot{transform-origin:24.5px 7.5px;animation:breakout 3.2s ease-in-out infinite}
   @keyframes breakout{0%,100%{transform:translate(0,0);opacity:1}45%{transform:translate(1.1px,-1.1px);opacity:1}55%{opacity:.55}}
   .wm{display:flex;flex-direction:column;line-height:1}
@@ -1197,7 +1220,7 @@ SHELL_HTML = r"""<!doctype html>
   @media (max-width:980px){.market-time{display:none}}
   @media (max-width:760px){header{gap:7px;padding:0 8px}.wm,.sep{display:none}nav button{padding:4px 8px}nav button kbd{display:none}.tick{gap:7px;padding:0 8px}.flow{gap:5px;padding-left:8px}.bar{width:48px}}
   @media (max-width:520px){.tick{height:32px;gap:6px}.sym em{display:none}.px{min-width:66px;font-size:12px}.chg{font-size:9px;padding:3px 5px}nav button{font-size:9px;padding:3px 6px}.ib{width:29px;height:29px}}
-  @media (prefers-reduced-motion:reduce){header::after,.brand .otm-dot,.tdot.on,.dot.open{animation:none}}
+  @media (prefers-reduced-motion:reduce){header::after,.brand .otm-dot,.brand svg .otm-orbit-a,.brand svg .otm-orbit-b,.tdot.on,.dot.open{animation:none}}
 </style></head>
 <body><div id="shell">
   <header>
