@@ -159,6 +159,16 @@ class TestShell(unittest.TestCase):
         pagine = {
             "fakemove.html": "<!doctype html><html><head><title>FM</title></head><body>FM</body></html>",
             "footprint.html": ('<!doctype html><html><head><script src="session-volume-profile.js"></script>'
+                               "<script>\n"
+                               "var css = '#kiyo-fp-head{display:flex;align-items:center;gap:0;padding:11px 16px;';\n"
+                               "head.innerHTML =\n"
+                               "  '<button id=\"kiyo-fp-trade\">TRADE</button>' +\n"
+                               "  '<button id=\"kiyo-fp-refresh\" style=\"font-size:15px;padding:0 7px;\">Refresh</button>' +\n"
+                               "  '<button id=\"kiyo-fp-close\" style=\"font-size:15px;padding:0 7px;\">Close</button>' +\n"
+                               "  '</div>';\n"
+                               "head.querySelector('#kiyo-fp-refresh').addEventListener('click', refresh);\n"
+                               "head.querySelector('#kiyo-fp-close').addEventListener('click', close);\n"
+                               "</script>"
                                "</head><body>FP</body></html>"),
             "session-volume-profile.js": "window.SVP=1;",
             "otm-nav.js": "window.OTMNav={};",
@@ -209,6 +219,17 @@ class TestShell(unittest.TestCase):
         self.assertIn("window.__OTM_LANG=' + JSON.stringify(LANG)", html)  # la shell la mette prima degli script della vista
         self.assertLess(vista.index("window.__OTM_DICT="), vista.index("window.OTMi18n = {"))
         self.assertIn('"Disponibile"', vista)                              # il catalogo c'e'
+
+    def test_toolbar_footprint_allineata_e_senza_refresh_o_chiusura(self):
+        html = self._html("en")
+        blob = re.search(r'<script type="application/json" id="v-footprint">(.*?)</script>', html, re.S).group(1)
+        vista = json.loads(blob)
+        self.assertIn("height:49px;min-height:49px;flex:0 0 49px;box-sizing:border-box;padding:0 18px;", vista)
+        self.assertNotIn('id="kiyo-fp-refresh"', vista)
+        self.assertNotIn('id="kiyo-fp-close"', vista)
+        self.assertNotIn("querySelector('#kiyo-fp-refresh')", vista)
+        self.assertNotIn("querySelector('#kiyo-fp-close')", vista)
+        self.assertIn('id="kiyo-fp-trade"', vista)
 
     def test_lingua_non_valida_ricade_sull_italiano(self):
         html = self._html("../../etc")

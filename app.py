@@ -916,6 +916,11 @@ _PATCHES = {
         "function _flash(t) { if (_msg) { _msg.textContent = t; setTimeout(() => { if (_msg.textContent === t) _msg.textContent = ''; }, 2200); } }",
         "function _flash(t) { if (_msg) { _msg.textContent = t; const _id = (_flash._n = (_flash._n || 0) + 1); setTimeout(() => { if (_flash._n === _id) _msg.textContent = ''; }, 2200); } }",
     )],
+    "footprint": [(
+        "#kiyo-fp-head{display:flex;align-items:center;gap:0;padding:11px 16px;",
+        "#kiyo-fp-head{display:flex;align-items:center;gap:0;height:49px;min-height:49px;"
+        "flex:0 0 49px;box-sizing:border-box;padding:0 18px;",
+    )],
 }
 
 
@@ -927,6 +932,19 @@ def _inject(html: str, nav_js: str, name: str = "") -> str:
         if vecchio in html:
             html = html.replace(vecchio, nuovo)
         else:
+            st.warning(tr("Correzione non applicata alla vista {nome}: riga non trovata.", nome=name))
+    if name == "footprint":
+        html, pulsanti = re.subn(
+            r"""(?m)^[ \t]*'<button id="kiyo-fp-(?:refresh|close)"[^'\r\n]*</button>' \+[ \t]*(?:\r?\n|$)""",
+            "",
+            html,
+        )
+        html, listener = re.subn(
+            r"""(?m)^[ \t]*head\.querySelector\('#kiyo-fp-(?:refresh|close)'\)\.addEventListener\('click', (?:refresh|close)\);[ \t]*""",
+            "",
+            html,
+        )
+        if pulsanti != 2 or listener != 2:
             st.warning(tr("Correzione non applicata alla vista {nome}: riga non trovata.", nome=name))
     head = _i18n_head() + _SHIM + "<script>\n" + nav_js + "\n</script>"
     i = html.lower().find("<head>")
