@@ -629,6 +629,26 @@
    "en": "EMA 50",
    "es": "EMA 50"
   },
+  "EMA 100": {
+   "it": "EMA 100",
+   "en": "EMA 100",
+   "es": "EMA 100"
+  },
+  "Indicatori": {
+   "it": "Indicatori",
+   "en": "Indicators",
+   "es": "Indicadores"
+  },
+  "INDICATORI": {
+   "it": "INDICATORI",
+   "en": "INDICATORS",
+   "es": "INDICADORES"
+  },
+  "SOVRAPPOSIZIONI E PANNELLI": {
+   "it": "SOVRAPPOSIZIONI E PANNELLI",
+   "en": "OVERLAYS & PANELS",
+   "es": "SUPERPOSICIONES Y PANELES"
+  },
   "VWAP · session/day": {
    "it": "VWAP · sessione/giorno",
    "en": "VWAP · session/day",
