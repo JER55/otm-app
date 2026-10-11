@@ -224,6 +224,17 @@ class TestShell(unittest.TestCase):
         self.assertLess(vista.index("window.__OTM_DICT="), vista.index("window.OTMi18n = {"))
         self.assertIn('"Disponibile"', vista)                              # il catalogo c'e'
 
+    def test_shell_evita_flash_del_loader_allavvio(self):
+        html = self._html("en")
+        self.assertIn('<main id="stage" class="booting">', html)
+        self.assertIn("#stage.booting iframe.view,#stage.booting iframe.view.on{transition:none}", html)
+        self.assertIn("opacity:0;visibility:hidden;transition:opacity .12s ease,visibility 0s linear .12s", html)
+        self.assertIn("transition:opacity .12s ease .12s,visibility 0s", html)
+        self.assertIn(
+            "if (n === START) requestAnimationFrame(function () { stage.classList.remove('booting'); });",
+            html,
+        )
+
     def test_shell_cache_si_invalida_quando_cambia_una_vista(self):
         path = os.path.join(self.dir, "views", "fakemove.html")
         at = self._run_app("it")

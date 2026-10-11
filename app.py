@@ -1410,8 +1410,10 @@ SHELL_HTML = r"""<!doctype html>
   iframe.view{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;visibility:hidden;pointer-events:none;
     transition:opacity .14s ease,visibility 0s linear .14s}
   iframe.view.on{opacity:1;visibility:visible;pointer-events:auto;z-index:1;transition:opacity .14s ease,visibility 0s}
-  #loader{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
-  #loader.on{display:grid}
+  #stage.booting iframe.view,#stage.booting iframe.view.on{transition:none}
+  #loader{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:5;
+    opacity:0;visibility:hidden;transition:opacity .12s ease,visibility 0s linear .12s}
+  #loader.on{opacity:1;visibility:visible;transition:opacity .12s ease .12s,visibility 0s}
   #loader div{display:flex;flex-direction:column;align-items:center;font:700 11px 'Inter',sans-serif;letter-spacing:.2em;color:var(--muted)}
   #loader svg{width:40px;height:40px;margin-bottom:14px;animation:breathe 1.6s ease-in-out infinite}
   @keyframes breathe{50%{opacity:.45;transform:scale(.94)}}
@@ -1457,7 +1459,7 @@ SHELL_HTML = r"""<!doctype html>
     <button class="ib" id="b-help" data-i18n-title="Comandi grafico (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg></button>
     <button class="ib" id="b-fs" data-i18n-title="Schermo intero (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   </header>
-  <main id="stage"><div id="loader"><div>%%MARK%%<span data-i18n="CARICAMENTO"></span><i></i></div></div></main>
+  <main id="stage" class="booting"><div id="loader"><div>%%MARK%%<span data-i18n="CARICAMENTO"></span><i></i></div></div></main>
 </div>
 <script type="application/json" id="v-fakemove">%%FM%%</script>
 <script type="application/json" id="v-footprint">%%FP%%</script>
@@ -1546,6 +1548,7 @@ SHELL_HTML = r"""<!doctype html>
     f.setAttribute('allow', 'fullscreen; clipboard-read; clipboard-write; autoplay');
     f.addEventListener('load', function () {
       V[n].ready = true; syncLoader(); applySuspend(); pushLang(n);
+      if (n === START) requestAnimationFrame(function () { stage.classList.remove('booting'); });
       var w = f.contentWindow;
       try {
         w.addEventListener('keydown', function (e) {
