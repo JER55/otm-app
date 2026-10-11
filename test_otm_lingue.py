@@ -224,6 +224,29 @@ class TestShell(unittest.TestCase):
         self.assertLess(vista.index("window.__OTM_DICT="), vista.index("window.OTMi18n = {"))
         self.assertIn('"Disponibile"', vista)                              # il catalogo c'e'
 
+    def test_shell_cache_si_invalida_quando_cambia_una_vista(self):
+        path = os.path.join(self.dir, "views", "fakemove.html")
+        at = self._run_app("it")
+
+        def vista_in_shell():
+            shell = next(e.proto.srcdoc for e in at.main
+                         if getattr(e, "type", "") == "iframe" and "var OTM_I18N" in e.proto.srcdoc)
+            blob = re.search(r'<script type="application/json" id="v-fakemove">(.*?)</script>',
+                             shell, re.S).group(1)
+            return json.loads(blob)
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("<!doctype html><html><head></head><body>VIEW VERSION ONE</body></html>")
+        at.run()
+        self.assertIn("VIEW VERSION ONE", vista_in_shell())
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("<!doctype html><html><head></head><body>VIEW VERSION TWO</body></html>")
+        at.run()
+        vista = vista_in_shell()
+        self.assertIn("VIEW VERSION TWO", vista)
+        self.assertNotIn("VIEW VERSION ONE", vista)
+
     def test_toolbar_footprint_allineata_e_senza_refresh_o_chiusura(self):
         html = self._html("en")
         blob = re.search(r'<script type="application/json" id="v-footprint">(.*?)</script>', html, re.S).group(1)

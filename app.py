@@ -1199,9 +1199,10 @@ def _blob(html: str) -> str:
 
 
 @st.cache_data(show_spinner=False, ttl=900)
-def _build_shell(_key: float, local: bool, shell_ver: str) -> str:
+def _build_shell(views_ver: str, local: bool, shell_ver: str) -> str:
+    # views_ver non deve iniziare con "_": Streamlit esclude quei parametri dalla cache.
     # shell_ver = hash di SHELL_HTML + logo: fa parte della chiave della cache.
-    _ = shell_ver
+    _ = (views_ver, shell_ver)
     shell_mark = OTM_MARK_SVG.replace("otm-mark", "otm-shell-mark")
     loader_mark = OTM_MARK_SVG.replace("otm-mark", "otm-loader-mark")
     return (SHELL_HTML
@@ -1228,18 +1229,28 @@ def _i18n_shell() -> str:
 
 
 def load_shell(local: bool, lang: str) -> str:
-    # in locale la cache si invalida quando cambi un file; da remoto vale il ttl di 15 minuti
+    # L'hash del contenuto invalida la shell sia per viste locali sia per quelle remote.
     files = {f for fs in VIEW_FILES.values() for f in fs}
-    key = max((VIEWS / f).stat().st_mtime for f in files) if LOCAL_VIEWS else 0.0
-    for extra in (BASE / "otm-i18n.js", BASE / "locales" / "views.json"):     # file della traduzione
-        try:
-            key = max(key, extra.stat().st_mtime)
-        except OSError:
-            pass
     ver = hashlib.sha1((SHELL_HTML + OTM_MARK_SVG).encode()).hexdigest()[:12]
     try:
         with st.spinner(tr("Carico le viste…")):
-            html = _build_shell(key, local, ver)
+            digest = hashlib.sha1()
+            for fname in sorted(files):
+                digest.update(fname.encode("utf-8"))
+                digest.update(b"\0")
+                content = ((VIEWS / fname).read_bytes() if LOCAL_VIEWS
+                           else _fetch_remote(fname).encode("utf-8"))
+                digest.update(content)
+                digest.update(b"\0")
+            for extra in (BASE / "otm-i18n.js", BASE / "locales" / "views.json"):
+                try:
+                    digest.update(extra.name.encode("utf-8"))
+                    digest.update(b"\0")
+                    digest.update(extra.read_bytes())
+                    digest.update(b"\0")
+                except OSError:
+                    pass
+            html = _build_shell(digest.hexdigest(), local, ver)
     except RuntimeError as e:
         st.error(tr("Impossibile caricare le viste: {errore}", errore=e))
         st.stop()
