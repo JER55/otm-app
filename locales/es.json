@@ -1,0 +1,41 @@
+{
+  "_info": {
+    "lingua": "es",
+    "nome": "Español",
+    "app": "OTM · Order Flow",
+    "note": "Clave = texto italiano del código. Mantén {marcadores} y etiquetas HTML idénticos; si no, la entrada se descarta y se muestra el italiano."
+  },
+  "messaggi": {
+    "Lingua": "Idioma",
+    "APERTA": "ABIERTA",
+    "CHIUSA": "CERRADA",
+    "PRE-MARKET": "PREMERCADO",
+    "chiude tra {d}": "cierra en {d}",
+    "apre tra {d}": "abre en {d}",
+    "Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)": "Sesión cash de EE. UU. 09:30–16:00 Nueva York (las áreas de valor de la Footprint usan esta sesión)",
+    "ROMA": "ROMA",
+    "Ora di Roma": "Hora de Roma",
+    "● LOCALE · LIVE": "● LOCAL · EN VIVO",
+    "● CLOUD · ANALISI": "● CLOUD · ANÁLISIS",
+    "Ordini reali tramite local-bitget-proxy.js (tetto 0,1 BTC)": "Órdenes reales mediante local-bitget-proxy.js (límite 0,1 BTC)",
+    "Esecuzione disattivata: per operare usa l'app in locale con il proxy": "Ejecución desactivada: para operar, usa la app en local con el proxy",
+    "Comandi grafico (?)": "Atajos del gráfico (?)",
+    "Schermo intero (F)": "Pantalla completa (F)",
+    "CARICAMENTO": "CARGANDO",
+    "Carico le viste…": "Cargando las vistas…",
+    "Impossibile caricare le viste: {errore}": "No se pueden cargar las vistas: {errore}",
+    "Tag di session-volume-profile.js non trovato nella Footprint: SVP non caricato.": "No se encontró la etiqueta de session-volume-profile.js en la Footprint: SVP no cargado.",
+    "Traduzione delle viste non disponibile: {errore}": "Traducción de las vistas no disponible: {errore}",
+    "Correzione non applicata alla vista {nome}: riga non trovata.": "Corrección no aplicada a la vista {nome}: línea no encontrada.",
+    "GITHUB_TOKEN mancante nei Secrets": "Falta GITHUB_TOKEN en los Secrets",
+    "token non valido o scaduto": "token no válido o caducado",
+    "token senza permesso Contents: Read": "token sin el permiso Contents: Read",
+    "repo o file non trovato (il token ha accesso al repo? il file è in views/?)": "repo o archivo no encontrado (¿el token tiene acceso al repo? ¿el archivo está en views/?)",
+    "GitHub {codice} su views/{file}: {motivo}": "GitHub {codice} en views/{file}: {motivo}",
+    "Impossibile contattare GitHub: {errore}": "No se puede contactar con GitHub: {errore}",
+    "APP_PASSWORD non configurata nei Secrets: accesso bloccato.": "APP_PASSWORD no configurada en los Secrets: acceso bloqueado.",
+    "Password": "Contraseña",
+    "ENTRA": "ENTRAR",
+    "Password errata.": "Contraseña incorrecta."
+  }
+}

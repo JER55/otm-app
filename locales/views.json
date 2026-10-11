@@ -1,0 +1,1060 @@
+{
+ "_info": {
+  "nota": "Catalogo delle viste (FakeMove, Footprint, otm-nav). Chiave = testo ESATTO com'è nel sorgente delle viste (italiano o inglese). Ogni voce ha it/en/es. {nome} = parte variabile. 'esatte' = intero testo di un nodo; 'frammenti' = sottostringa di testi composti.",
+  "regola": "Stessi segnaposto {nome} in tutte e tre le lingue; niente tag HTML. Termini di trading (LONG, SHORT, TP, SL, POC, VAH, CVD, OI, ARMED, VETO...) restano invariati."
+ },
+ "esatte": {
+  "Zoom indietro": {
+   "it": "Zoom indietro",
+   "en": "Zoom out",
+   "es": "Alejar"
+  },
+  "Zoom avanti": {
+   "it": "Zoom avanti",
+   "en": "Zoom in",
+   "es": "Acercar"
+  },
+  "Scala prezzi automatica": {
+   "it": "Scala prezzi automatica",
+   "en": "Automatic price scale",
+   "es": "Escala de precios automática"
+  },
+  "Righello": {
+   "it": "Righello",
+   "en": "Ruler",
+   "es": "Regla"
+  },
+  "Reset vista": {
+   "it": "Reset vista",
+   "en": "Reset view",
+   "es": "Restablecer vista"
+  },
+  "Vai al live": {
+   "it": "Vai al live",
+   "en": "Go to live",
+   "es": "Ir al directo"
+  },
+  "Schermo intero": {
+   "it": "Schermo intero",
+   "en": "Full screen",
+   "es": "Pantalla completa"
+  },
+  "Tutti i comandi": {
+   "it": "Tutti i comandi",
+   "en": "All shortcuts",
+   "es": "Todos los atajos"
+  },
+  "RIGHELLO · ESC": {
+   "it": "RIGHELLO · ESC",
+   "en": "RULER · ESC",
+   "es": "REGLA · ESC"
+  },
+  "SCALA MANUALE · A": {
+   "it": "SCALA MANUALE · A",
+   "en": "MANUAL SCALE · A",
+   "es": "ESCALA MANUAL · A"
+  },
+  "Scala prezzi": {
+   "it": "Scala prezzi",
+   "en": "Price scale",
+   "es": "Escala de precios"
+  },
+  "Scala": {
+   "it": "Scala",
+   "en": "Scale",
+   "es": "Escala"
+  },
+  "manuale": {
+   "it": "manuale",
+   "en": "manual",
+   "es": "manual"
+  },
+  "· doppio clic sull'asse o": {
+   "it": "· doppio clic sull'asse o",
+   "en": "· double-click the axis or",
+   "es": "· doble clic en el eje o"
+  },
+  "per AUTO": {
+   "it": "per AUTO",
+   "en": "for AUTO",
+   "es": "para AUTO"
+  },
+  "Righello:": {
+   "it": "Righello:",
+   "en": "Ruler:",
+   "es": "Regla:"
+  },
+  "trascina": {
+   "it": "trascina",
+   "en": "drag",
+   "es": "arrastra"
+  },
+  "sul grafico · Esc per uscire": {
+   "it": "sul grafico · Esc per uscire",
+   "en": "on the chart · Esc to exit",
+   "es": "sobre el gráfico · Esc para salir"
+  },
+  "Vista": {
+   "it": "Vista",
+   "en": "View",
+   "es": "Vista"
+  },
+  "ripristinata": {
+   "it": "ripristinata",
+   "en": "restored",
+   "es": "restablecida"
+  },
+  "Nuova navigazione attiva · premi": {
+   "it": "Nuova navigazione attiva · premi",
+   "en": "New navigation active · press",
+   "es": "Nueva navegación activa · pulsa"
+  },
+  "per tutti i comandi": {
+   "it": "per tutti i comandi",
+   "en": "for all shortcuts",
+   "es": "para ver todos los atajos"
+  },
+  "Schermo intero non disponibile qui": {
+   "it": "Schermo intero non disponibile qui",
+   "en": "Full screen not available here",
+   "es": "Pantalla completa no disponible aquí"
+  },
+  "COMANDI": {
+   "it": "COMANDI",
+   "en": "CHART",
+   "es": "CONTROLES"
+  },
+  "GRAFICO": {
+   "it": "GRAFICO",
+   "en": "CONTROLS",
+   "es": "DEL GRÁFICO"
+  },
+  "Navigazione stile terminale professionale ·": {
+   "it": "Navigazione stile terminale professionale ·",
+   "en": "Professional terminal-style navigation ·",
+   "es": "Navegación estilo terminal profesional ·"
+  },
+  "Tastiera": {
+   "it": "Tastiera",
+   "en": "Keyboard",
+   "es": "Teclado"
+  },
+  "Zoom sotto il cursore": {
+   "it": "Zoom sotto il cursore",
+   "en": "Zoom at cursor",
+   "es": "Zoom bajo el cursor"
+  },
+  "Rotella": {
+   "it": "Rotella",
+   "en": "Wheel",
+   "es": "Rueda"
+  },
+  "Zoom fine (pinch)": {
+   "it": "Zoom fine (pinch)",
+   "en": "Fine zoom (pinch)",
+   "es": "Zoom fino (pellizco)"
+  },
+  "Ctrl + rotella": {
+   "it": "Ctrl + rotella",
+   "en": "Ctrl + wheel",
+   "es": "Ctrl + rueda"
+  },
+  "Scorri nel tempo": {
+   "it": "Scorri nel tempo",
+   "en": "Scroll through time",
+   "es": "Desplazar en el tiempo"
+  },
+  "Shift + rotella": {
+   "it": "Shift + rotella",
+   "en": "Shift + wheel",
+   "es": "Shift + rueda"
+  },
+  "Sposta il grafico": {
+   "it": "Sposta il grafico",
+   "en": "Move the chart",
+   "es": "Mover el gráfico"
+  },
+  "Trascina": {
+   "it": "Trascina",
+   "en": "Drag",
+   "es": "Arrastrar"
+  },
+  "Trascina asse ←": {
+   "it": "Trascina asse ←",
+   "en": "Drag axis ←",
+   "es": "Arrastrar eje ←"
+  },
+  "Zoom tempo": {
+   "it": "Zoom tempo",
+   "en": "Time zoom",
+   "es": "Zoom temporal"
+  },
+  "Trascina asse ↓": {
+   "it": "Trascina asse ↓",
+   "en": "Drag axis ↓",
+   "es": "Arrastrar eje ↓"
+  },
+  "Scala AUTO": {
+   "it": "Scala AUTO",
+   "en": "AUTO scale",
+   "es": "Escala AUTO"
+  },
+  "2× clic asse": {
+   "it": "2× clic asse",
+   "en": "2× click axis",
+   "es": "2× clic en el eje"
+  },
+  "2× clic grafico": {
+   "it": "2× clic grafico",
+   "en": "2× click chart",
+   "es": "2× clic en el gráfico"
+  },
+  "Righello Δ": {
+   "it": "Righello Δ",
+   "en": "Ruler Δ",
+   "es": "Regla Δ"
+  },
+  "Shift + trascina": {
+   "it": "Shift + trascina",
+   "en": "Shift + drag",
+   "es": "Shift + arrastrar"
+  },
+  "Scorri": {
+   "it": "Scorri",
+   "en": "Scroll",
+   "es": "Desplazar"
+  },
+  "Scorri veloce": {
+   "it": "Scorri veloce",
+   "en": "Fast scroll",
+   "es": "Desplazar rápido"
+  },
+  "Scala verticale": {
+   "it": "Scala verticale",
+   "en": "Vertical scale",
+   "es": "Escala vertical"
+  },
+  "Scala AUTO on/off": {
+   "it": "Scala AUTO on/off",
+   "en": "AUTO scale on/off",
+   "es": "Escala AUTO on/off"
+  },
+  "Cambia vista": {
+   "it": "Cambia vista",
+   "en": "Switch view",
+   "es": "Cambiar vista"
+  },
+  "Chiudi / annulla": {
+   "it": "Chiudi / annulla",
+   "en": "Close / cancel",
+   "es": "Cerrar / cancelar"
+  },
+  "Sposta": {
+   "it": "Sposta",
+   "en": "Move",
+   "es": "Mover"
+  },
+  "1 dito": {
+   "it": "1 dito",
+   "en": "1 finger",
+   "es": "1 dedo"
+  },
+  "2 dita": {
+   "it": "2 dita",
+   "en": "2 fingers",
+   "es": "2 dedos"
+  },
+  "Doppio tap": {
+   "it": "Doppio tap",
+   "en": "Double tap",
+   "es": "Doble toque"
+  },
+  "Reset": {
+   "it": "Reset",
+   "en": "Reset",
+   "es": "Restablecer"
+  },
+  "per chiudere.": {
+   "it": "per chiudere.",
+   "en": "to close.",
+   "es": "para cerrar."
+  },
+  "barra": {
+   "it": "barra",
+   "en": "bar",
+   "es": "barra"
+  },
+  "barre": {
+   "it": "barre",
+   "en": "bars",
+   "es": "barras"
+  },
+  "gg": {
+   "it": "g",
+   "en": "d",
+   "es": "d"
+  },
+  "Disponibile": {
+   "it": "Disponibile",
+   "en": "Available",
+   "es": "Disponible"
+  },
+  "Leva": {
+   "it": "Leva",
+   "en": "Leverage",
+   "es": "Apalancamiento"
+  },
+  "Quantità": {
+   "it": "Quantità",
+   "en": "Amount",
+   "es": "Cantidad"
+  },
+  "Costo stimato": {
+   "it": "Costo stimato",
+   "en": "Estimated cost",
+   "es": "Coste estimado"
+  },
+  "Apri long": {
+   "it": "Apri long",
+   "en": "Open long",
+   "es": "Abrir long"
+  },
+  "Apri short": {
+   "it": "Apri short",
+   "en": "Open short",
+   "es": "Abrir short"
+  },
+  "Es. 97000": {
+   "it": "Es. 97000",
+   "en": "E.g. 97000",
+   "es": "Ej. 97000"
+  },
+  "Es. 93000": {
+   "it": "Es. 93000",
+   "en": "E.g. 93000",
+   "es": "Ej. 93000"
+  },
+  "Binance (sorgente primaria, sempre attiva)": {
+   "it": "Binance (sorgente primaria, sempre attiva)",
+   "en": "Binance (primary source, always on)",
+   "es": "Binance (fuente principal, siempre activa)"
+  },
+  "IP NON IN WHITELIST": {
+   "it": "IP NON IN WHITELIST",
+   "en": "IP NOT WHITELISTED",
+   "es": "IP FUERA DE LA LISTA BLANCA"
+  },
+  "API KEY MANCANTE": {
+   "it": "API KEY MANCANTE",
+   "en": "API KEY MISSING",
+   "es": "FALTA LA API KEY"
+  },
+  "NON CONNESSO": {
+   "it": "NON CONNESSO",
+   "en": "NOT CONNECTED",
+   "es": "NO CONECTADO"
+  },
+  "EXECUTOR ASSENTE": {
+   "it": "EXECUTOR ASSENTE",
+   "en": "EXECUTOR MISSING",
+   "es": "EXECUTOR AUSENTE"
+  },
+  "Inserisci Quantità USDT valida": {
+   "it": "Inserisci Quantità USDT valida",
+   "en": "Enter a valid USDT amount",
+   "es": "Introduce una cantidad USDT válida"
+  },
+  "Bitget Executor non disponibile": {
+   "it": "Bitget Executor non disponibile",
+   "en": "Bitget Executor not available",
+   "es": "Bitget Executor no disponible"
+  },
+  "Prezzo di mercato non disponibile, attendere.": {
+   "it": "Prezzo di mercato non disponibile, attendere.",
+   "en": "Market price not available, please wait.",
+   "es": "Precio de mercado no disponible, espera."
+  },
+  "Ordine piazzato con successo": {
+   "it": "Ordine piazzato con successo",
+   "en": "Order placed successfully",
+   "es": "Orden enviada con éxito"
+  },
+  "Reconstructing order flow": {
+   "it": "Ricostruzione order flow",
+   "en": "Reconstructing order flow",
+   "es": "Reconstruyendo order flow"
+  },
+  "order-flow sync…": {
+   "it": "sincronizzazione order flow…",
+   "en": "order-flow sync…",
+   "es": "sincronizando order flow…"
+  },
+  "No data": {
+   "it": "Nessun dato",
+   "en": "No data",
+   "es": "Sin datos"
+  },
+  "idle": {
+   "it": "inattivo",
+   "en": "idle",
+   "es": "inactivo"
+  },
+  "disconnected - polling": {
+   "it": "disconnesso - polling",
+   "en": "disconnected - polling",
+   "es": "desconectado - polling"
+  },
+  "ws error": {
+   "it": "errore ws",
+   "en": "ws error",
+   "es": "error de ws"
+  },
+  "ws error - polling": {
+   "it": "errore ws - polling",
+   "en": "ws error - polling",
+   "es": "error de ws - polling"
+  },
+  "CUM Δ · US SESS": {
+   "it": "CUM Δ · SESS. US",
+   "en": "CUM Δ · US SESS",
+   "es": "CUM Δ · SESIÓN US"
+  },
+  "Δ CELL": {
+   "it": "Δ CELLA",
+   "en": "Δ CELL",
+   "es": "Δ CELDA"
+  },
+  "Δ BAR": {
+   "it": "Δ BARRA",
+   "en": "Δ BAR",
+   "es": "Δ BARRA"
+  },
+  "initializing…": {
+   "it": "inizializzazione…",
+   "en": "initializing…",
+   "es": "inicializando…"
+  },
+  "NEUTRO": {
+   "it": "NEUTRO",
+   "en": "NEUTRAL",
+   "es": "NEUTRO"
+  },
+  "BID ASSORBE": {
+   "it": "BID ASSORBE",
+   "en": "BID ABSORBS",
+   "es": "BID ABSORBE"
+  },
+  "ASK ASSORBE": {
+   "it": "ASK ASSORBE",
+   "en": "ASK ABSORBS",
+   "es": "ASK ABSORBE"
+  },
+  "FLUSSO LONG": {
+   "it": "FLUSSO LONG",
+   "en": "LONG FLOW",
+   "es": "FLUJO LONG"
+  },
+  "FLUSSO SHORT": {
+   "it": "FLUSSO SHORT",
+   "en": "SHORT FLOW",
+   "es": "FLUJO SHORT"
+  },
+  "In attesa": {
+   "it": "In attesa",
+   "en": "Waiting",
+   "es": "En espera"
+  },
+  "struttura direzionale (ENV) + prezzo nella golden zone.": {
+   "it": "struttura direzionale (ENV) + prezzo nella golden zone.",
+   "en": "directional structure (ENV) + price in the golden zone.",
+   "es": "estructura direccional (ENV) + precio en la golden zone."
+  },
+  "1° fallimento liquidità": {
+   "it": "1° fallimento liquidità",
+   "en": "1st liquidity failure",
+   "es": "1.er fallo de liquidez"
+  },
+  "il 2° tocco difeso della liquidità per ARMARE il setup.": {
+   "it": "il 2° tocco difeso della liquidità per ARMARE il setup.",
+   "en": "the 2nd defended touch of the liquidity to ARM the setup.",
+   "es": "el 2.º toque defendido de la liquidez para ARMAR el setup."
+  },
+  "ARMED · doppio fallimento confermato": {
+   "it": "ARMED · doppio fallimento confermato",
+   "en": "ARMED · double failure confirmed",
+   "es": "ARMED · doble fallo confirmado"
+  },
+  "ritracciamento in golden zone + conferma order-flow (absorption ≥ soglia e partecipazione ≥ soglia).": {
+   "it": "ritracciamento in golden zone + conferma order-flow (absorption ≥ soglia e partecipazione ≥ soglia).",
+   "en": "retracement into the golden zone + order-flow confirmation (absorption ≥ threshold and participation ≥ threshold).",
+   "es": "retroceso hacia la golden zone + confirmación del order-flow (absorption ≥ umbral y participación ≥ umbral)."
+  },
+  "TRIGGER · setup completo": {
+   "it": "TRIGGER · setup completo",
+   "en": "TRIGGER · setup complete",
+   "es": "TRIGGER · setup completo"
+  },
+  "gestione posizione: SL/TP attivi, si monitora l’esito.": {
+   "it": "gestione posizione: SL/TP attivi, si monitora l’esito.",
+   "en": "position management: SL/TP active, monitoring the outcome.",
+   "es": "gestión de la posición: SL/TP activos, se vigila el resultado."
+  },
+  "VETO · setup annullato": {
+   "it": "VETO · setup annullato",
+   "en": "VETO · setup cancelled",
+   "es": "VETO · setup anulado"
+  },
+  "nuove condizioni valide (struttura/fib/liquidità).": {
+   "it": "nuove condizioni valide (struttura/fib/liquidità).",
+   "en": "new valid conditions (structure/fib/liquidity).",
+   "es": "nuevas condiciones válidas (estructura/fib/liquidez)."
+  },
+  "Azzera trade e statistiche del paper e riparti": {
+   "it": "Azzera trade e statistiche del paper e riparti",
+   "en": "Clear paper trades and statistics and start over",
+   "es": "Borrar operaciones y estadísticas del paper y empezar de nuevo"
+  },
+  "RAGIONAMENTI": {
+   "it": "RAGIONAMENTI",
+   "en": "REASONING",
+   "es": "RAZONAMIENTOS"
+  },
+  "OPERAZIONI": {
+   "it": "OPERAZIONI",
+   "en": "TRADES",
+   "es": "OPERACIONES"
+  },
+  "solo transizioni": {
+   "it": "solo transizioni",
+   "en": "transitions only",
+   "es": "solo transiciones"
+  },
+  "in position": {
+   "it": "in posizione",
+   "en": "in position",
+   "es": "en posición"
+  },
+  "IN POSITION": {
+   "it": "IN POSIZIONE",
+   "en": "IN POSITION",
+   "es": "EN POSICIÓN"
+  },
+  "managing": {
+   "it": "gestione",
+   "en": "managing",
+   "es": "gestionando"
+  },
+  "⚙️ Settings": {
+   "it": "⚙️ Impostazioni",
+   "en": "⚙️ Settings",
+   "es": "⚙️ Ajustes"
+  },
+  "Structure · bias min": {
+   "it": "Struttura · bias min",
+   "en": "Structure · bias min",
+   "es": "Estructura · sesgo mín."
+  },
+  "Confirmation · absorption min": {
+   "it": "Conferma · absorption min",
+   "en": "Confirmation · absorption min",
+   "es": "Confirmación · absorción mín."
+  },
+  "Participation min (trades/30s)": {
+   "it": "Partecipazione min (trade/30s)",
+   "en": "Participation min (trades/30s)",
+   "es": "Participación mín. (operaciones/30 s)"
+  },
+  "R:R minimum": {
+   "it": "R:R minimo",
+   "en": "R:R minimum",
+   "es": "R:R mínimo"
+  },
+  "RISK PRESETS": {
+   "it": "PRESET DI RISCHIO",
+   "en": "RISK PRESETS",
+   "es": "PRESETS DE RIESGO"
+  },
+  "USER SLOTS": {
+   "it": "SLOT UTENTE",
+   "en": "USER SLOTS",
+   "es": "SLOTS DE USUARIO"
+  },
+  "SOFT": {
+   "it": "PRUDENTE",
+   "en": "SOFT",
+   "es": "SUAVE"
+  },
+  "BALANCED": {
+   "it": "BILANCIATO",
+   "en": "BALANCED",
+   "es": "EQUILIBRADO"
+  },
+  "AGGRESSIVE": {
+   "it": "AGGRESSIVO",
+   "en": "AGGRESSIVE",
+   "es": "AGRESIVO"
+  },
+  "SAVE CURRENT": {
+   "it": "SALVA CORRENTE",
+   "en": "SAVE CURRENT",
+   "es": "GUARDAR ACTUAL"
+  },
+  "EXIT · TP / SL": {
+   "it": "USCITA · TP / SL",
+   "en": "EXIT · TP / SL",
+   "es": "SALIDA · TP / SL"
+  },
+  "RISCHIO MAX / TRADE": {
+   "it": "RISCHIO MAX / TRADE",
+   "en": "MAX RISK / TRADE",
+   "es": "RIESGO MÁX. / OPERACIÓN"
+  },
+  "% equity a rischio": {
+   "it": "% equity a rischio",
+   "en": "% equity at risk",
+   "es": "% de equity en riesgo"
+  },
+  "LIQUIDITY DELTA PROFILER": {
+   "it": "PROFILER DELTA DI LIQUIDITÀ",
+   "en": "LIQUIDITY DELTA PROFILER",
+   "es": "PERFILADOR DELTA DE LIQUIDEZ"
+  },
+  "Pivot = swing width for BSL/SSL bands": {
+   "it": "Pivot = ampiezza dello swing per le bande BSL/SSL",
+   "en": "Pivot = swing width for BSL/SSL bands",
+   "es": "Pivot = amplitud del swing para las bandas BSL/SSL"
+  },
+  "Pivot (swing lookback)": {
+   "it": "Pivot (lookback dello swing)",
+   "en": "Pivot (swing lookback)",
+   "es": "Pivot (lookback del swing)"
+  },
+  "Max zones per side": {
+   "it": "Zone massime per lato",
+   "en": "Max zones per side",
+   "es": "Zonas máximas por lado"
+  },
+  "Zone volume capacity": {
+   "it": "Capacità volume della zona",
+   "en": "Zone volume capacity",
+   "es": "Capacidad de volumen de la zona"
+  },
+  "Signal alerts": {
+   "it": "Avvisi di segnale",
+   "en": "Signal alerts",
+   "es": "Alertas de señal"
+  },
+  "Paper panel": {
+   "it": "Pannello paper",
+   "en": "Paper panel",
+   "es": "Panel paper"
+  },
+  "Reset markers": {
+   "it": "Reimposta i marker",
+   "en": "Reset markers",
+   "es": "Restablecer marcadores"
+  },
+  "REAL order-flow on SPY, the tradable S&P 500 proxy. Enter your Alpaca API keys (free plan).": {
+   "it": "Order-flow REALE su SPY, il proxy negoziabile dell’S&P 500. Inserisci le tue API key Alpaca (piano gratuito).",
+   "en": "REAL order-flow on SPY, the tradable S&P 500 proxy. Enter your Alpaca API keys (free plan).",
+   "es": "Order-flow REAL sobre SPY, el proxy negociable del S&P 500. Introduce tus claves API de Alpaca (plan gratuito)."
+  },
+  "API Key ID": {
+   "it": "ID della API Key",
+   "en": "API Key ID",
+   "es": "ID de la API Key"
+  },
+  "API Secret Key": {
+   "it": "API Secret Key",
+   "en": "API Secret Key",
+   "es": "API Secret Key"
+  },
+  "Connect SPY": {
+   "it": "Collega SPY",
+   "en": "Connect SPY",
+   "es": "Conectar SPY"
+  },
+  "Chiudi": {
+   "it": "Chiudi",
+   "en": "Close",
+   "es": "Cerrar"
+  },
+  "Bitcoin · native SegWit": {
+   "it": "Bitcoin · SegWit nativo",
+   "en": "Bitcoin · native SegWit",
+   "es": "Bitcoin · SegWit nativo"
+  },
+  "On-chain BTC only": {
+   "it": "Solo BTC on-chain",
+   "en": "On-chain BTC only",
+   "es": "Solo BTC on-chain"
+  },
+  "NO TAG / MEMO REQUIRED": {
+   "it": "NESSUN TAG / MEMO RICHIESTO",
+   "en": "NO TAG / MEMO REQUIRED",
+   "es": "NO SE REQUIERE TAG / MEMO"
+  },
+  "TRADER TO TRADER": {
+   "it": "DA TRADER A TRADER",
+   "en": "TRADER TO TRADER",
+   "es": "DE TRADER A TRADER"
+  },
+  "BUILT BY ONE, USED BY MANY": {
+   "it": "COSTRUITO DA UNO, USATO DA MOLTI",
+   "en": "BUILT BY ONE, USED BY MANY",
+   "es": "CREADO POR UNO, USADO POR MUCHOS"
+  },
+  "SUPPORT THE BUILD": {
+   "it": "SOSTIENI IL PROGETTO",
+   "en": "SUPPORT THE BUILD",
+   "es": "APOYA EL PROYECTO"
+  },
+  "Copied ✓": {
+   "it": "Copiato ✓",
+   "en": "Copied ✓",
+   "es": "Copiado ✓"
+  }
+ },
+ "frammenti": {
+  "Il righello resta ancorato a prezzo e barre: puoi zoomare e scorrere mentre lo leggi. Premi": {
+   "it": "Il righello resta ancorato a prezzo e barre: puoi zoomare e scorrere mentre lo leggi. Premi",
+   "en": "The ruler stays anchored to price and bars: you can zoom and scroll while reading it. Press",
+   "es": "La regla permanece anclada al precio y a las barras: puedes hacer zoom y desplazarte mientras la lees. Pulsa"
+  },
+  "APRI VIA": {
+   "it": "APRI VIA",
+   "en": "OPEN VIA",
+   "es": "ABRIR VÍA"
+  },
+  "Dimensione troppo piccola:": {
+   "it": "Dimensione troppo piccola:",
+   "en": "Size too small:",
+   "es": "Tamaño demasiado pequeño:"
+  },
+  "Minimo 0.0001 BTC.": {
+   "it": "Minimo 0.0001 BTC.",
+   "en": "Minimum 0.0001 BTC.",
+   "es": "Mínimo 0.0001 BTC."
+  },
+  "Conferma Ordine": {
+   "it": "Conferma Ordine",
+   "en": "Confirm Order",
+   "es": "Confirmar orden"
+  },
+  "margine x": {
+   "it": "margine x",
+   "en": "margin x",
+   "es": "margen x"
+  },
+  "Leva:": {
+   "it": "Leva:",
+   "en": "Leverage:",
+   "es": "Apalancamiento:"
+  },
+  "Errore ordine:": {
+   "it": "Errore ordine:",
+   "en": "Order error:",
+   "es": "Error de orden:"
+  },
+  "Prossimo:": {
+   "it": "Prossimo:",
+   "en": "Next:",
+   "es": "Siguiente:"
+  },
+  "→ attesa:": {
+   "it": "→ attesa:",
+   "en": "→ waiting for:",
+   "es": "→ esperando:"
+  },
+  "Nessun trade chiuso ancora. Le metriche si popolano man mano che il paper chiude posizioni.": {
+   "it": "Nessun trade chiuso ancora. Le metriche si popolano man mano che il paper chiude posizioni.",
+   "en": "No closed trades yet. Metrics fill in as the paper account closes positions.",
+   "es": "Aún no hay operaciones cerradas. Las métricas se completan a medida que el paper cierra posiciones."
+  },
+  "Azzerare TUTTI i trade e le statistiche del paper trading e ripartire da zero?\n\nOperazione NON reversibile.": {
+   "it": "Azzerare TUTTI i trade e le statistiche del paper trading e ripartire da zero?\n\nOperazione NON reversibile.",
+   "en": "Clear ALL paper-trading trades and statistics and start from zero?\n\nThis operation is NOT reversible.",
+   "es": "¿Borrar TODAS las operaciones y estadísticas del paper trading y empezar de cero?\n\nOperación NO reversible."
+  },
+  "Diagnostica": {
+   "it": "Diagnostica",
+   "en": "Diagnostics",
+   "es": "Diagnóstico"
+  },
+  "Nessun evento per questo filtro.": {
+   "it": "Nessun evento per questo filtro.",
+   "en": "No events for this filter.",
+   "es": "Ningún evento para este filtro."
+  },
+  "Nessuna operazione chiusa ancora. Le operazioni compaiono qui quando il paper chiude una posizione (SL/TP/manuale).": {
+   "it": "Nessuna operazione chiusa ancora. Le operazioni compaiono qui quando il paper chiude una posizione (SL/TP/manuale).",
+   "en": "No closed trades yet. Trades appear here when the paper account closes a position (SL/TP/manual).",
+   "es": "Aún no hay operaciones cerradas. Las operaciones aparecen aquí cuando el paper cierra una posición (SL/TP/manual)."
+  },
+  "{n} operazioni": {
+   "it": "{n} operazioni",
+   "en": "{n} trades",
+   "es": "{n} operaciones"
+  },
+  "· durata": {
+   "it": "· durata",
+   "en": "· duration",
+   "es": "· duración"
+  },
+  "rischio ": {
+   "it": "rischio ",
+   "en": "risk ",
+   "es": "riesgo "
+  },
+  "candele verdi": {
+   "it": "candele verdi",
+   "en": "green candles",
+   "es": "velas verdes"
+  },
+  "⏸ ancoraggio {tf} in caricamento · reasoning sospeso": {
+   "it": "⏸ ancoraggio {tf} in caricamento · reasoning sospeso",
+   "en": "⏸ {tf} anchor loading · reasoning paused",
+   "es": "⏸ cargando anclaje {tf} · reasoning en pausa"
+  },
+  "⏸ feed prezzo non valido · in attesa dati": {
+   "it": "⏸ feed prezzo non valido · in attesa dati",
+   "en": "⏸ invalid price feed · awaiting data",
+   "es": "⏸ feed de precio no válido · esperando datos"
+  },
+  "IN ZONA": {
+   "it": "IN ZONA",
+   "en": "IN ZONE",
+   "es": "EN ZONA"
+  },
+  "· SL/TP non validi": {
+   "it": "· SL/TP non validi",
+   "en": "· invalid SL/TP",
+   "es": "· SL/TP no válidos"
+  },
+  "· partecipazione bassa (": {
+   "it": "· partecipazione bassa (",
+   "en": "· low participation (",
+   "es": "· participación baja ("
+  },
+  "ARMED: awaiting retracement into golden zone": {
+   "it": "ARMED: in attesa del ritracciamento in golden zone",
+   "en": "ARMED: awaiting retracement into golden zone",
+   "es": "ARMED: esperando el retroceso hacia la golden zone"
+  },
+  "awaiting price in golden zone (fib)": {
+   "it": "in attesa del prezzo in golden zone (fib)",
+   "en": "awaiting price in golden zone (fib)",
+   "es": "esperando el precio en la golden zone (fib)"
+  },
+  "· location not aligned (awaiting pull-back to value)": {
+   "it": "· location non allineata (in attesa del ritorno sul valore)",
+   "en": "· location not aligned (awaiting pull-back to value)",
+   "es": "· location no alineada (esperando el retroceso al valor)"
+  },
+  "· outside Fib zone (retr": {
+   "it": "· fuori zona Fib (retr",
+   "en": "· outside Fib zone (retr",
+   "es": "· fuera de la zona Fib (retr"
+  },
+  "· awaiting 2nd failure on liquidity zone (": {
+   "it": "· in attesa del 2° fallimento sulla zona di liquidità (",
+   "en": "· awaiting 2nd failure on liquidity zone (",
+   "es": "· esperando el 2.º fallo en la zona de liquidez ("
+  },
+  "· awaiting failed aggression (abs=": {
+   "it": "· in attesa di aggressione fallita (abs=",
+   "en": "· awaiting failed aggression (abs=",
+   "es": "· esperando agresión fallida (abs="
+  },
+  "LOCATION N/A · awaiting Value Area": {
+   "it": "LOCATION N/D · in attesa della Value Area",
+   "en": "LOCATION N/A · awaiting Value Area",
+   "es": "LOCATION N/D · esperando la Value Area"
+  },
+  "CONFIRMATION N/A · order flow not ready": {
+   "it": "CONFIRMATION N/D · order flow non pronto",
+   "en": "CONFIRMATION N/A · order flow not ready",
+   "es": "CONFIRMATION N/D · order flow no listo"
+  },
+  "ENV balanced · no dominant structure (no-trade)": {
+   "it": "ENV bilanciato · nessuna struttura dominante (no-trade)",
+   "en": "ENV balanced · no dominant structure (no-trade)",
+   "es": "ENV equilibrado · sin estructura dominante (no-trade)"
+  },
+  "degenerate swing leg (retr": {
+   "it": "gamba di swing degenere (retr",
+   "en": "degenerate swing leg (retr",
+   "es": "tramo de swing degenerado (retr"
+  },
+  "broken swing origin (retr": {
+   "it": "origine dello swing rotta (retr",
+   "en": "broken swing origin (retr",
+   "es": "origen del swing roto (retr"
+  },
+  "VETO Fib:": {
+   "it": "VETO Fib:",
+   "en": "VETO Fib:",
+   "es": "VETO Fib:"
+  },
+  "· one-position-at-a-time": {
+   "it": "· una posizione alla volta",
+   "en": "· one-position-at-a-time",
+   "es": "· una posición a la vez"
+  },
+  "confirmed · cooldown active": {
+   "it": "confermato · cooldown attivo",
+   "en": "confirmed · cooldown active",
+   "es": "confirmado · cooldown activo"
+  },
+  "outside GZ ·": {
+   "it": "fuori GZ ·",
+   "en": "outside GZ ·",
+   "es": "fuera de GZ ·"
+  },
+  "outside fib zone": {
+   "it": "fuori zona fib",
+   "en": "outside fib zone",
+   "es": "fuera de la zona fib"
+  },
+  "not aligned": {
+   "it": "non allineata",
+   "en": "not aligned",
+   "es": "no alineada"
+  },
+  "gate OFF": {
+   "it": "gate OFF",
+   "en": "gate OFF",
+   "es": "gate OFF"
+  },
+  "SL/TP invalid": {
+   "it": "SL/TP non validi",
+   "en": "SL/TP invalid",
+   "es": "SL/TP no válidos"
+  },
+  "Value Area N/A": {
+   "it": "Value Area N/D",
+   "en": "Value Area N/A",
+   "es": "Value Area N/D"
+  },
+  "order flow N/A": {
+   "it": "order flow N/D",
+   "en": "order flow N/A",
+   "es": "order flow N/D"
+  },
+  "degenerate swing": {
+   "it": "swing degenere",
+   "en": "degenerate swing",
+   "es": "swing degenerado"
+  },
+  "broken swing": {
+   "it": "swing rotto",
+   "en": "broken swing",
+   "es": "swing roto"
+  },
+  "awaiting": {
+   "it": "in attesa",
+   "en": "awaiting",
+   "es": "esperando"
+  },
+  "MANAGING": {
+   "it": "GESTIONE",
+   "en": "MANAGING",
+   "es": "GESTIONANDO"
+  },
+  "daily -{p}%": {
+   "it": "giorn. -{p}%",
+   "en": "daily -{p}%",
+   "es": "diario -{p}%"
+  },
+  "{n} loss streak": {
+   "it": "{n} perdite consecutive",
+   "en": "{n} loss streak",
+   "es": "{n} pérdidas seguidas"
+  },
+  "Preset applicato:": {
+   "it": "Preset applicato:",
+   "en": "Preset applied:",
+   "es": "Preset aplicado:"
+  },
+  "Slot vuoto — imposta le soglie e premi SAVE CURRENT": {
+   "it": "Slot vuoto — imposta le soglie e premi SAVE CURRENT",
+   "en": "Empty slot — set the thresholds and press SAVE CURRENT",
+   "es": "Ranura vacía — define los umbrales y pulsa SAVE CURRENT"
+  },
+  "Soglie correnti salvate in": {
+   "it": "Soglie correnti salvate in",
+   "en": "Current thresholds saved to",
+   "es": "Umbrales actuales guardados en"
+  },
+  "SL/TP dal frame Value Area (VAL/VAH/VPOC) + ripiego Fib · ATR-clamp sullo stop": {
+   "it": "SL/TP dal frame Value Area (VAL/VAH/VPOC) + ripiego Fib · ATR-clamp sullo stop",
+   "en": "SL/TP from the Value Area frame (VAL/VAH/VPOC) + Fib fallback · ATR-clamp on the stop",
+   "es": "SL/TP del marco Value Area (VAL/VAH/VPOC) + respaldo Fib · ATR-clamp en el stop"
+  },
+  "rischio $ = equity × % ; size = rischio$ ÷ distanza SL (notional cappato a leva×equity)": {
+   "it": "rischio $ = equity × % ; size = rischio$ ÷ distanza SL (notional cappato a leva×equity)",
+   "en": "risk $ = equity × % ; size = risk$ ÷ SL distance (notional capped at leverage×equity)",
+   "es": "riesgo $ = equity × % ; tamaño = riesgo$ ÷ distancia SL (nocional limitado a apalancamiento×equity)"
+  },
+  "Fib: require zone (hard gate)": {
+   "it": "Fib: richiedi la zona (gate rigido)",
+   "en": "Fib: require zone (hard gate)",
+   "es": "Fib: exigir la zona (gate estricto)"
+  },
+  "LOCATION via Fibonacci (golden zone)": {
+   "it": "LOCATION via Fibonacci (golden zone)",
+   "en": "LOCATION via Fibonacci (golden zone)",
+   "es": "LOCATION vía Fibonacci (golden zone)"
+  },
+  "SP500 · SPY (Alpaca — free IEX feed)": {
+   "it": "SP500 · SPY (Alpaca — feed IEX gratuito)",
+   "en": "SP500 · SPY (Alpaca — free IEX feed)",
+   "es": "SP500 · SPY (Alpaca — feed IEX gratuito)"
+  },
+  "Keys stay in your browser (localStorage) and are sent only to Alpaca.": {
+   "it": "Le chiavi restano nel tuo browser (localStorage) e vengono inviate solo ad Alpaca.",
+   "en": "Keys stay in your browser (localStorage) and are sent only to Alpaca.",
+   "es": "Las claves permanecen en tu navegador (localStorage) y solo se envían a Alpaca."
+  },
+  "IEX ≈ 2-3% of consolidated volume, 1-level DOM (top bid/ask), US market hours only.": {
+   "it": "IEX ≈ 2-3% del volume consolidato, DOM a 1 livello (miglior bid/ask), solo orari del mercato USA.",
+   "en": "IEX ≈ 2-3% of consolidated volume, 1-level DOM (top bid/ask), US market hours only.",
+   "es": "IEX ≈ 2-3 % del volumen consolidado, DOM de 1 nivel (mejor bid/ask), solo horario del mercado de EE. UU."
+  },
+  "For deep L2 (SIP / ES) a paid feed is required (Databento / Polygon Advanced / dxFeed): same interface, just swap the provider.": {
+   "it": "Per un L2 profondo (SIP / ES) serve un feed a pagamento (Databento / Polygon Advanced / dxFeed): stessa interfaccia, basta cambiare il provider.",
+   "en": "For deep L2 (SIP / ES) a paid feed is required (Databento / Polygon Advanced / dxFeed): same interface, just swap the provider.",
+   "es": "Para un L2 profundo (SIP / ES) se necesita un feed de pago (Databento / Polygon Advanced / dxFeed): misma interfaz, solo cambia el proveedor."
+  },
+  "If this engine earns you an edge, send some back — every sat compounds.": {
+   "it": "Se questo motore ti dà un vantaggio, restituisci qualcosa — ogni sat si accumula.",
+   "en": "If this engine earns you an edge, send some back — every sat compounds.",
+   "es": "Si este motor te da una ventaja, devuelve algo — cada sat se acumula."
+  },
+  "Now: setup confirmed in": {
+   "it": "Ora: setup confermato in",
+   "en": "Now: setup confirmed in",
+   "es": "Ahora: setup confirmado en"
+  },
+  "sellers absorbed": {
+   "it": "venditori assorbiti",
+   "en": "sellers absorbed",
+   "es": "vendedores absorbidos"
+  },
+  "buyers absorbed": {
+   "it": "compratori assorbiti",
+   "en": "buyers absorbed",
+   "es": "compradores absorbidos"
+  },
+  ") at the ": {
+   "it": ") al ",
+   "en": ") at the ",
+   "es": ") en el "
+  },
+  "th zone touch": {
+   "it": "° tocco della zona",
+   "en": "th zone touch",
+   "es": ".º toque de la zona"
+  }
+ }
+}

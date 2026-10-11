@@ -1,0 +1,41 @@
+{
+  "_info": {
+    "lingua": "en",
+    "nome": "English",
+    "app": "OTM · Order Flow",
+    "note": "Key = Italian text in the code. Keep {placeholders} and HTML tags identical, otherwise the entry is discarded and Italian is shown."
+  },
+  "messaggi": {
+    "Lingua": "Language",
+    "APERTA": "OPEN",
+    "CHIUSA": "CLOSED",
+    "PRE-MARKET": "PRE-MARKET",
+    "chiude tra {d}": "closes in {d}",
+    "apre tra {d}": "opens in {d}",
+    "Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)": "US cash session 09:30–16:00 New York (the Footprint value areas use this session)",
+    "ROMA": "ROME",
+    "Ora di Roma": "Rome time",
+    "● LOCALE · LIVE": "● LOCAL · LIVE",
+    "● CLOUD · ANALISI": "● CLOUD · ANALYSIS",
+    "Ordini reali tramite local-bitget-proxy.js (tetto 0,1 BTC)": "Real orders via local-bitget-proxy.js (0.1 BTC cap)",
+    "Esecuzione disattivata: per operare usa l'app in locale con il proxy": "Execution disabled: to trade, run the app locally with the proxy",
+    "Comandi grafico (?)": "Chart shortcuts (?)",
+    "Schermo intero (F)": "Full screen (F)",
+    "CARICAMENTO": "LOADING",
+    "Carico le viste…": "Loading views…",
+    "Impossibile caricare le viste: {errore}": "Unable to load the views: {errore}",
+    "Tag di session-volume-profile.js non trovato nella Footprint: SVP non caricato.": "session-volume-profile.js tag not found in the Footprint: SVP not loaded.",
+    "Traduzione delle viste non disponibile: {errore}": "View translation not available: {errore}",
+    "Correzione non applicata alla vista {nome}: riga non trovata.": "Fix not applied to the {nome} view: line not found.",
+    "GITHUB_TOKEN mancante nei Secrets": "GITHUB_TOKEN missing from Secrets",
+    "token non valido o scaduto": "invalid or expired token",
+    "token senza permesso Contents: Read": "token lacks the Contents: Read permission",
+    "repo o file non trovato (il token ha accesso al repo? il file è in views/?)": "repo or file not found (does the token have access to the repo? is the file in views/?)",
+    "GitHub {codice} su views/{file}: {motivo}": "GitHub {codice} on views/{file}: {motivo}",
+    "Impossibile contattare GitHub: {errore}": "Unable to reach GitHub: {errore}",
+    "APP_PASSWORD non configurata nei Secrets: accesso bloccato.": "APP_PASSWORD not set in Secrets: access blocked.",
+    "Password": "Password",
+    "ENTRA": "ENTER",
+    "Password errata.": "Wrong password."
+  }
+}

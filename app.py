@@ -18,14 +18,31 @@ Adattamenti applicati qui al caricamento delle viste:
   2. otm-nav.js (motore di navigazione) inserito in entrambe le viste
   3. rilevamento "localhost" letto dalla pagina principale (non dall'iframe)
   4. in cloud le chiamate di esecuzione (proxy/Netlify) vengono bloccate
+
+Lingue (IT · EN · ES, con traduzioni.py e locales/*.json — stesso sistema di ThinkCore):
+  * testi Python con tr("..."); testi della shell con t("...") / data-i18n="..." nell'HTML:
+    le chiavi della shell sono estratte da SHELL_HTML, nessun elenco da tenere allineato;
+  * si parte in italiano; ?lang=en|es nell'indirizzo o [interfaccia] lingua nei Secrets;
+  * login: selettore Streamlit; dentro l'app: selettore IT/EN/ES nella barra, cambio
+    istantaneo senza ricaricare le viste (scrive ?lang= nell'indirizzo per il reload);
+  * le viste ricevono la lingua: window.__OTM_LANG prima dei loro script, poi l'evento
+    'otm:lang' (detail.lang) a ogni cambio e OTMNav.instance.setLang(lang) se esiste;
+  * FakeMove, Footprint e otm-nav.js sono tradotti a runtime da otm-i18n.js con il catalogo
+    locales/views.json (testo DOM, attributi, canvas, alert/confirm, notifiche): i file delle
+    viste non vanno modificati.
 """
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+
+import traduzioni as tz
+
+tr = tz.tr
 
 BASE = Path(__file__).parent
 VIEWS = BASE / "views"
@@ -102,11 +119,40 @@ _SHIM = """<script>
 </script>"""
 
 
-def _inject(html: str, nav_js: str) -> str:
+def _i18n_head() -> str:
+    """Catalogo delle viste + traduttore a runtime (otm-i18n.js): vanno in testa alla vista,
+    prima di otm-nav.js e dei suoi script, cosi' canvas, alert e DOM sono gia' agganciati."""
+    try:
+        doc = json.loads((BASE / "locales" / "views.json").read_text(encoding="utf-8"))
+        js = (BASE / "otm-i18n.js").read_text(encoding="utf-8")
+    except (OSError, ValueError) as ex:
+        st.warning(tr("Traduzione delle viste non disponibile: {errore}", errore=ex))
+        return ""
+    dati = {"esatte": doc.get("esatte", {}), "frammenti": doc.get("frammenti", {})}
+    blob = json.dumps(dati, ensure_ascii=False).replace("<", "\\u003c")
+    return "<script>window.__OTM_DICT=" + blob + ";</script><script>\n" + js + "\n</script>"
+
+
+# Correzioni sul sorgente delle viste (se la riga non c'e' piu', la vista resta com'e')
+_PATCHES = {
+    # il messaggio si cancellava confrontando il testo del DOM, che la traduzione puo' aver cambiato
+    "fakemove": [(
+        "function _flash(t) { if (_msg) { _msg.textContent = t; setTimeout(() => { if (_msg.textContent === t) _msg.textContent = ''; }, 2200); } }",
+        "function _flash(t) { if (_msg) { _msg.textContent = t; const _id = (_flash._n = (_flash._n || 0) + 1); setTimeout(() => { if (_flash._n === _id) _msg.textContent = ''; }, 2200); } }",
+    )],
+}
+
+
+def _inject(html: str, nav_js: str, name: str = "") -> str:
     # dentro l'iframe srcdoc location.hostname e' vuoto: usiamo quello della pagina principale
     html = html.replace("window.location.hostname", "window.__OTM_HOST")
     html = html.replace("location.hostname", "window.__OTM_HOST")
-    head = _SHIM + "<script>\n" + nav_js + "\n</script>"
+    for vecchio, nuovo in _PATCHES.get(name, []):
+        if vecchio in html:
+            html = html.replace(vecchio, nuovo)
+        else:
+            st.warning(tr("Correzione non applicata alla vista {nome}: riga non trovata.", nome=name))
+    head = _i18n_head() + _SHIM + "<script>\n" + nav_js + "\n</script>"
     i = html.lower().find("<head>")
     if i != -1:
         j = i + len("<head>")
@@ -134,7 +180,7 @@ def _secret(key: str, default: str = "") -> str:
         return default
 
 
-@st.cache_data(show_spinner="Carico la vista…", ttl=900)
+@st.cache_data(show_spinner=False, ttl=900)
 def _fetch_remote(fname: str) -> str:
     import urllib.error
     import urllib.request
@@ -143,7 +189,7 @@ def _fetch_remote(fname: str) -> str:
     repo = _secret("VIEWS_REPO", "JER55/otm-streamlit")
     branch = _secret("VIEWS_BRANCH", "main")
     if not token:
-        raise RuntimeError("GITHUB_TOKEN mancante nei Secrets")
+        raise RuntimeError(tr("GITHUB_TOKEN mancante nei Secrets"))
     req = urllib.request.Request(
         _secret("GITHUB_API", "https://api.github.com") + f"/repos/{repo}/contents/views/{fname}?ref={branch}",
         headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github.raw+json",
@@ -153,13 +199,16 @@ def _fetch_remote(fname: str) -> str:
         with urllib.request.urlopen(req, timeout=20) as r:
             return r.read().decode("utf-8")
     except urllib.error.HTTPError as e:
-        hint = {401: "token non valido o scaduto", 403: "token senza permesso Contents: Read",
-                404: "repo o file non trovato (il token ha accesso al repo? il file e' in views/?)"}.get(e.code, "")
+        hint = {401: tr("token non valido o scaduto"), 403: tr("token senza permesso Contents: Read"),
+                404: tr("repo o file non trovato (il token ha accesso al repo? il file è in views/?)")}.get(e.code, "")
         try:
             msg = json.loads(e.read().decode()).get("message", "")
         except Exception:
             msg = ""
-        raise RuntimeError(f"GitHub {e.code} su views/{fname}: {hint} {msg}".strip()) from None
+        raise RuntimeError(tr("GitHub {codice} su views/{file}: {motivo}", codice=e.code, file=fname,
+                              motivo=f"{hint} {msg}".strip())) from None
+    except (urllib.error.URLError, TimeoutError) as e:     # rete giu' o timeout: messaggio, non traceback
+        raise RuntimeError(tr("Impossibile contattare GitHub: {errore}", errore=getattr(e, "reason", e))) from None
 
 
 def _read(fname: str) -> str:
@@ -176,10 +225,10 @@ def _build_view(name: str) -> str:
         if tag in html:
             html = html.replace(tag, "<script>\n" + svp + "\n</script>")
         else:
-            st.warning("Tag di session-volume-profile.js non trovato nella Footprint: SVP non caricato.")
+            st.warning(tr("Tag di session-volume-profile.js non trovato nella Footprint: SVP non caricato."))
     else:
         html = _read("fakemove.html")
-    return _inject(html, nav)
+    return _inject(html, nav, name)
 
 
 def _blob(html: str) -> str:
@@ -197,21 +246,46 @@ def _build_shell(_key: float, local: bool, _shell_ver: str) -> str:
             .replace("%%FM%%", _blob(_build_view("fakemove"))))
 
 
-def load_shell(local: bool) -> str:
+def shell_keys(shell: str) -> list:
+    """Testi traducibili della shell: t("...") nello script, data-i18n="..." e data-i18n-title="..." nell'HTML."""
+    keys = set(re.findall(r'\bt\("([^"\\]+)"', shell))
+    keys |= set(re.findall(r'data-i18n(?:-title)?="([^"]+)"', shell))
+    return sorted(keys)
+
+
+def _i18n_shell() -> str:
+    # i testi della shell in tutte e tre le lingue: il cambio dalla barra e' istantaneo, senza rerun.
+    # Stessi cataloghi (e stessi controlli su segnaposto e tag) dei testi Python.
+    keys = shell_keys(SHELL_HTML)
+    d = {lg: {k: tz.traduci(lg, k) for k in keys} for lg in tz.LINGUE}
+    return json.dumps(d, ensure_ascii=False).replace("<", "\\u003c")
+
+
+def load_shell(local: bool, lang: str) -> str:
     # in locale la cache si invalida quando cambi un file; da remoto vale il ttl di 15 minuti
     files = {f for fs in VIEW_FILES.values() for f in fs}
     key = max((VIEWS / f).stat().st_mtime for f in files) if LOCAL_VIEWS else 0.0
+    for extra in (BASE / "otm-i18n.js", BASE / "locales" / "views.json"):     # file della traduzione
+        try:
+            key = max(key, extra.stat().st_mtime)
+        except OSError:
+            pass
     ver = hashlib.sha1(SHELL_HTML.encode()).hexdigest()[:12]
     try:
-        return _build_shell(key, local, ver)
+        with st.spinner(tr("Carico le viste…")):
+            html = _build_shell(key, local, ver)
     except RuntimeError as e:
-        st.error(f"Impossibile caricare le viste: {e}")
+        st.error(tr("Impossibile caricare le viste: {errore}", errore=e))
         st.stop()
+    # lingua e testi fuori dalla cache: i segnaposto sono nell'<head>, prima delle viste
+    lang = tz.codice_valido(lang) or tz.BASE
+    return html.replace("%%LANG%%", lang, 1).replace("%%I18N%%", _i18n_shell(), 1)
 
 
 # ── Shell lato browser ──────────────────────────────────────────────────────
 SHELL_HTML = r"""<!doctype html>
-<html lang="it"><head><meta charset="utf-8">
+<html lang="%%LANG%%"><head><meta charset="utf-8">
+<script>var OTM_I18N = %%I18N%%;</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -246,6 +320,12 @@ SHELL_HTML = r"""<!doctype html>
   .pill{font:700 9.5px 'JetBrains Mono',monospace;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap;cursor:default}
   .pill.live{color:var(--red);border-color:rgba(255,92,92,.4);background:rgba(255,92,92,.08)}
   .pill.safe{color:var(--teal);border-color:rgba(61,212,200,.4);background:rgba(61,212,200,.08)}
+  .lang{display:flex;background:#0a111d;border:1px solid var(--elev);border-radius:7px;padding:1px}
+  .lang button{all:unset;cursor:pointer;padding:1px 6px;border-radius:5px;color:var(--muted);
+    font:700 9.5px/16px 'JetBrains Mono',monospace;letter-spacing:.04em;transition:color .15s,background .15s}
+  .lang button:hover:not(.on){color:var(--light)}
+  .lang button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
+  .lang button.on{color:#06110f;background:var(--teal)}
   .ib{all:unset;cursor:pointer;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:var(--muted);
     border:1px solid transparent;transition:all .15s}
   .ib:hover{color:var(--light);background:rgba(61,212,200,.1);border-color:rgba(61,212,200,.25)}
@@ -273,13 +353,18 @@ SHELL_HTML = r"""<!doctype html>
       <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd>]</kbd></button>
     </nav>
     <div class="sp"></div>
-    <div class="chip hide-m" id="sess" title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)"><span class="dot" id="sdot"></span><span id="stxt">US</span></div>
-    <div class="chip hide-m" title="Ora di Roma">ROMA <b id="clock">--:--:--</b></div>
+    <div class="chip hide-m" id="sess" data-i18n-title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)"><span class="dot" id="sdot"></span><span>US <b id="sst"></b> · <span id="snext"></span></span></div>
+    <div class="chip hide-m" data-i18n-title="Ora di Roma"><span data-i18n="ROMA"></span> <b id="clock">--:--:--</b></div>
     <span class="pill" id="mode"></span>
-    <button class="ib" id="b-help" title="Comandi grafico (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg></button>
-    <button class="ib" id="b-fs" title="Schermo intero (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <div class="lang" id="lang" role="radiogroup" data-i18n-title="Lingua">
+      <button role="radio" data-l="it" title="Italiano">IT</button>
+      <button role="radio" data-l="en" title="English">EN</button>
+      <button role="radio" data-l="es" title="Español">ES</button>
+    </div>
+    <button class="ib" id="b-help" data-i18n-title="Comandi grafico (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg></button>
+    <button class="ib" id="b-fs" data-i18n-title="Schermo intero (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   </header>
-  <main id="stage"><div id="loader"><div>CARICAMENTO<i></i></div></div></main>
+  <main id="stage"><div id="loader"><div><span data-i18n="CARICAMENTO"></span><i></i></div></div></main>
 </div>
 <script type="application/json" id="v-fakemove">%%FM%%</script>
 <script type="application/json" id="v-footprint">%%FP%%</script>
@@ -293,10 +378,49 @@ SHELL_HTML = r"""<!doctype html>
   var tabs = document.getElementById('tabs'), ink = tabs.querySelector('.ink');
   var cur = null, pseudo = false, lastCycle = 0;
 
+  // ── lingua: testi da OTM_I18N (generato in Python dai cataloghi locales/*.json) ──
+  var LANG = OTM_I18N[document.documentElement.lang] ? document.documentElement.lang : 'it';
+  function t(k, v) {
+    var d = OTM_I18N[LANG] || {}, s = d[k] || k;
+    if (v) s = s.replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(v, n) ? v[n] : m; });
+    return s;
+  }
   var mode = document.getElementById('mode');
   mode.className = 'pill ' + (LOCAL ? 'live' : 'safe');
-  mode.textContent = LOCAL ? '● LOCALE · LIVE' : '● CLOUD · ANALISI';
-  mode.title = LOCAL ? 'Ordini reali tramite local-bitget-proxy.js (tetto 0,1 BTC)' : 'Esecuzione disattivata: per operare usa l\'app in locale con il proxy';
+  function applyLang() {
+    document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) { el.title = t(el.getAttribute('data-i18n-title')); });
+    mode.textContent = LOCAL ? t("● LOCALE · LIVE") : t("● CLOUD · ANALISI");
+    mode.title = LOCAL ? t("Ordini reali tramite local-bitget-proxy.js (tetto 0,1 BTC)")
+                       : t("Esecuzione disattivata: per operare usa l'app in locale con il proxy");
+    document.querySelectorAll('#lang button').forEach(function (b) {
+      var on = b.getAttribute('data-l') === LANG;
+      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    if (typeof tick === 'function') tick();
+    if (typeof moveInk === 'function') moveInk();
+  }
+  function pushLang(n) {                          // la vista riceve la lingua (variabile + evento + setLang)
+    var w = win(n); if (!w) return;
+    try {
+      if (w.__OTM_LANG === LANG && V[n].langSent) return;
+      w.__OTM_LANG = LANG; V[n].langSent = true;
+      w.document.documentElement.lang = LANG;
+      w.dispatchEvent(new w.CustomEvent('otm:lang', { detail: { lang: LANG } }));
+      var i = nav(n); if (i && typeof i.setLang === 'function') i.setLang(LANG);
+    } catch (e) {}
+  }
+  function setLang(l) {
+    if (!OTM_I18N[l] || l === LANG) return;
+    LANG = l; applyLang();
+    ORDER.forEach(function (n) { if (V[n].ready) pushLang(n); });
+    // ?lang= nell'indirizzo: al ricaricamento Streamlit riparte in questa lingua
+    [window.parent, window.top].forEach(function (w, i, a) {
+      if (i && w === a[0]) return;
+      try { var u = new URL(w.location.href); u.searchParams.set('lang', l); w.history.replaceState(w.history.state, '', u.toString()); } catch (e) {}
+    });
+  }
 
   function win(n) { return V[n].f && V[n].f.contentWindow; }
   function nav(n) { var w = win(n); return w && w.OTMNav && w.OTMNav.instance; }
@@ -325,7 +449,7 @@ SHELL_HTML = r"""<!doctype html>
     f.className = 'view'; f.title = n;
     f.setAttribute('allow', 'fullscreen; clipboard-read; clipboard-write; autoplay');
     f.addEventListener('load', function () {
-      V[n].ready = true; syncLoader(); applySuspend();
+      V[n].ready = true; syncLoader(); applySuspend(); pushLang(n);
       var w = f.contentWindow;
       try {
         w.addEventListener('keydown', function (e) {
@@ -337,13 +461,12 @@ SHELL_HTML = r"""<!doctype html>
       } catch (e) {}
       if (n === cur) focusView(n, 40);
     });
-    // la vista nasce gia' sospesa se non e' quella attiva: non disegna nemmeno al primo frame
+    // prima di ogni script della vista: la lingua e, se non e' quella attiva, la sospensione
+    // (cosi' non disegna nemmeno al primo frame)
     var html = JSON.parse(document.getElementById('v-' + n).textContent);
-    if (n !== cur) {
-      var pre = '<script>window.__OTM_SUSPENDED=true;<\/script>';
-      var i = html.search(/<head[^>]*>/i);
-      html = i !== -1 ? html.replace(/<head[^>]*>/i, function (m) { return m + pre; }) : pre + html;
-    }
+    var pre = '<script>window.__OTM_LANG=' + JSON.stringify(LANG) + ';document.documentElement.lang=window.__OTM_LANG;'
+            + (n !== cur ? 'window.__OTM_SUSPENDED=true;' : '') + '<\/script>';
+    html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function (m) { return m + pre; }) : pre + html;
     f.srcdoc = html;
     stage.appendChild(f); V[n].f = f;
     syncLoader();
@@ -420,22 +543,29 @@ SHELL_HTML = r"""<!doctype html>
     document.getElementById('clock').textContent = fmtRome.format(d);
     var o = {}; fmtNY.formatToParts(d).forEach(function (p) { o[p.type] = p.value; });
     var wd = WD[o.weekday], mins = (+o.hour % 24) * 60 + (+o.minute) + (+o.second) / 60;
-    var OPEN = 570, CLOSE = 960, PRE = 240, dot = document.getElementById('sdot'), txt = document.getElementById('stxt');
+    var OPEN = 570, CLOSE = 960, PRE = 240, dot = document.getElementById('sdot');
+    var st = document.getElementById('sst'), nx = document.getElementById('snext');
     var weekday = wd >= 1 && wd <= 5;
-    if (weekday && mins >= OPEN && mins < CLOSE) { dot.className = 'dot open'; txt.innerHTML = 'US <b>APERTA</b> · chiude ' + dur(CLOSE - mins); return; }
+    if (weekday && mins >= OPEN && mins < CLOSE) {
+      dot.className = 'dot open'; st.textContent = t("APERTA"); nx.textContent = t("chiude tra {d}", { d: dur(CLOSE - mins) }); return;
+    }
     var until;
     if (weekday && mins < OPEN) until = OPEN - mins;
     else { var days = wd === 5 ? 3 : (wd === 6 ? 2 : 1); until = days * 1440 - mins + OPEN; }
     var pre = weekday && mins >= PRE && mins < OPEN;
     dot.className = 'dot' + (pre ? ' pre' : '');
-    txt.innerHTML = 'US <b>' + (pre ? 'PRE-MARKET' : 'CHIUSA') + '</b> · apre ' + dur(until);
+    st.textContent = pre ? t("PRE-MARKET") : t("CHIUSA");
+    nx.textContent = t("apre tra {d}", { d: dur(until) });
   }
-  tick(); setInterval(tick, 1000);
+  applyLang(); setInterval(tick, 1000);
 
   // ── input ──
   // pointerdown invece di click: lo switch parte alla pressione, non al rilascio
   tabs.addEventListener('pointerdown', function (e) { var b = e.target.closest('button'); if (b && e.button === 0) { e.preventDefault(); show(b.getAttribute('data-v')); } });
   tabs.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { var b = e.target.closest('button'); if (b) { e.preventDefault(); show(b.getAttribute('data-v')); } } });
+  document.getElementById('lang').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (b) { setLang(b.getAttribute('data-l')); focusView(cur, 0); }
+  });
   document.getElementById('b-fs').addEventListener('click', fullscreen);
   document.getElementById('b-help').addEventListener('click', function () { var i = nav(cur); if (i) i.help(); });
   document.addEventListener('keydown', function (e) {
@@ -447,7 +577,8 @@ SHELL_HTML = r"""<!doctype html>
   document.addEventListener('fullscreenchange', function () { setTimeout(fit, 50); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveInk);
 
-  window.OTMShell = { show: show, cycle: cycle, fullscreen: fullscreen, exitPseudo: function () { if (pseudo) setPseudo(false); } };
+  window.OTMShell = { show: show, cycle: cycle, fullscreen: fullscreen, exitPseudo: function () { if (pseudo) setPseudo(false); },
+                      setLang: setLang, lang: function () { return LANG; }, t: t };
 
   show(START);
   requestAnimationFrame(function () { moveInk(); requestAnimationFrame(function () { tabs.classList.remove('noanim'); }); });
@@ -470,27 +601,29 @@ def _require_login(is_local: bool) -> None:
         expected = st.secrets.get("APP_PASSWORD", "")
     except Exception:
         expected = ""
+    if (not expected and is_local) or st.session_state.get("otm_auth"):
+        return                    # dentro l'app la lingua si cambia dalla barra della shell
+
+    # selettore IT · EN · ES prima di ogni st.stop(): c'e' anche sulla schermata d'accesso
+    _, sel = st.columns([5, 1])
+    tz.selettore(sel)
     if not expected:
-        if is_local:
-            return
-        st.error("APP_PASSWORD non configurata nei Secrets: accesso bloccato.")
+        st.error(tr("APP_PASSWORD non configurata nei Secrets: accesso bloccato."))
         st.stop()
-    if st.session_state.get("otm_auth"):
-        return
 
     _, mid, _ = st.columns([1, 1.2, 1])
     with mid:
-        st.markdown('<div class="otm-brand" style="text-align:center;margin:12vh 0 18px">'
+        st.markdown('<div class="otm-brand" style="text-align:center;margin:10vh 0 18px">'
                     'OUTTHINK <span>THE MARKET</span></div>', unsafe_allow_html=True)
         with st.form("otm_login"):
-            pwd = st.text_input("Password", type="password")
-            ok = st.form_submit_button("ENTRA", use_container_width=True)
+            pwd = st.text_input(tr("Password"), type="password", key="otm_pwd")
+            ok = st.form_submit_button(tr("ENTRA"), use_container_width=True)
         if ok:
             if hmac.compare_digest(pwd.encode(), str(expected).encode()):
                 st.session_state["otm_auth"] = True
                 st.rerun()
             time.sleep(1.5)  # rallenta i tentativi a forza bruta
-            st.error("Password errata.")
+            st.error(tr("Password errata."))
     st.stop()
 
 
@@ -499,4 +632,4 @@ _require_login(local)
 
 # Un solo componente: la shell gestisce tab, viste e schermo intero lato browser,
 # quindi nessun rerun di Streamlit quando cambi vista o ridimensioni.
-components.html(load_shell(local), height=860, scrolling=False)
+components.html(load_shell(local, tz.lingua_corrente()), height=860, scrolling=False)
