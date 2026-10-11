@@ -27,7 +27,7 @@ Identita' della scheda del browser:
 Lingue (IT · EN · ES, con traduzioni.py e locales/*.json — stesso sistema di ThinkCore):
   * testi Python con tr("..."); testi della shell con t("...") / data-i18n="..." nell'HTML:
     le chiavi della shell sono estratte da SHELL_HTML, nessun elenco da tenere allineato;
-  * si parte in italiano; ?lang=en|es nell'indirizzo o [interfaccia] lingua nei Secrets;
+  * si parte in inglese; ?lang=it|es nell'indirizzo o [interfaccia] lingua nei Secrets;
   * login: selettore Streamlit; dentro l'app: selettore IT/EN/ES nella barra, cambio
     istantaneo senza ricaricare le viste (scrive ?lang= nell'indirizzo per il reload);
   * le viste ricevono la lingua: window.__OTM_LANG prima dei loro script, poi l'evento
@@ -1039,7 +1039,7 @@ def load_shell(local: bool, lang: str) -> str:
         st.error(tr("Impossibile caricare le viste: {errore}", errore=e))
         st.stop()
     # lingua e testi fuori dalla cache: i segnaposto sono nell'<head>, prima delle viste
-    lang = tz.codice_valido(lang) or tz.BASE
+    lang = tz.codice_valido(lang) or "en"
     return html.replace("%%LANG%%", lang, 1).replace("%%I18N%%", _i18n_shell(), 1)
 
 

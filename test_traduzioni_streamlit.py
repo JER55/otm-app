@@ -52,11 +52,11 @@ class TestSelettore(unittest.TestCase):
     def _app(self):
         return AppTest.from_file(self.script, default_timeout=30)
 
-    def test_predefinita_italiano(self):
+    def test_predefinita_inglese(self):
         at = self._app().run()
         self.assertFalse(at.exception)
-        self.assertEqual(at.markdown[0].value, "Genera turni")
-        self.assertEqual(at.markdown[-1].value, "LINGUA=it")
+        self.assertEqual(at.markdown[0].value, "Generate rota")
+        self.assertEqual(at.markdown[-1].value, "LINGUA=en")
 
     def test_lingua_dall_indirizzo(self):
         at = self._app()
@@ -70,13 +70,13 @@ class TestSelettore(unittest.TestCase):
         at.query_params["lang"] = "../../etc/passwd"
         at.run()
         self.assertFalse(at.exception)
-        self.assertEqual(at.markdown[-1].value, "LINGUA=it")
+        self.assertEqual(at.markdown[-1].value, "LINGUA=en")
 
-    def test_browser_in_inglese_parte_comunque_in_italiano(self):
-        # scelta di prodotto: si parte in italiano, la lingua del browser non conta
+    def test_browser_in_inglese_parte_in_inglese(self):
+        # L'inglese è il default indipendentemente dalla lingua del browser.
         at = self._app()
         at.run()
-        self.assertEqual(at.markdown[-1].value, "LINGUA=it")
+        self.assertEqual(at.markdown[-1].value, "LINGUA=en")
 
     def test_lingua_dai_secrets(self):
         at = self._app()
@@ -87,11 +87,11 @@ class TestSelettore(unittest.TestCase):
     def test_cambio_dal_selettore_conserva_i_widget(self):
         at = self._app().run()
         at.checkbox(key="opz").uncheck().run()
-        at.segmented_control(key=tz.CHIAVE_WIDGET).set_value("en").run()
-        self.assertEqual(at.markdown[0].value, "Generate rota")
-        self.assertEqual(at.checkbox(key="opz").label, "Option")
+        at.segmented_control(key=tz.CHIAVE_WIDGET).set_value("es").run()
+        self.assertEqual(at.markdown[0].value, "Generar turnos")
+        self.assertEqual(at.checkbox(key="opz").label, "Opción")
         self.assertFalse(at.checkbox(key="opz").value)          # lo stato non si azzera
-        self.assertEqual(at.query_params.get("lang"), "en")
+        self.assertEqual(at.query_params["lang"], ["es"])
 
     def test_lingua_sopravvive_a_una_pagina_fermata(self):
         at = self._app().run()

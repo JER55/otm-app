@@ -19,7 +19,7 @@ Come funziona (stile gettext, solo libreria standard):
   * Una lingua per sessione, letta da st.session_state a ogni chiamata. Mai una variabile
     globale: le sessioni contemporanee sono thread dello stesso processo e se la
     ruberebbero a vicenda.
-  * Si parte sempre in italiano. Cambia solo se qualcuno la sceglie: dal selettore IT · EN · ES
+  * Si parte in inglese. Cambia dal selettore IT · EN · ES
     (la scelta resta nell'indirizzo, ?lang=en, e sopravvive al ricaricamento della pagina)
     oppure, per un intero negozio, con [interfaccia] lingua = "es" nei Secrets dell'app.
 
@@ -332,8 +332,8 @@ def _st():
 
 
 def _lingua_iniziale(st):
-    """?lang= nell'indirizzo → [interfaccia] lingua nei Secrets → italiano.
-    La lingua del browser NON conta: l'app parte in italiano finché qualcuno non la cambia."""
+    """?lang= nell'indirizzo → [interfaccia] lingua nei Secrets → inglese.
+    La lingua del browser non conta: in assenza di una scelta esplicita si parte in inglese."""
     try:
         c = codice_valido(st.query_params.get(PARAMETRO_URL))
         if c:
@@ -347,7 +347,7 @@ def _lingua_iniziale(st):
             return c
     except Exception:
         pass                       # Secrets assenti o illeggibili: ci pensa la licenza a segnalarlo
-    return BASE
+    return "en"
 
 
 _FORZATA = threading.local()
