@@ -41,6 +41,14 @@
     "APP_PASSWORD non configurata nei Secrets: accesso bloccato.": "APP_PASSWORD not set in Secrets: access blocked.",
     "Password": "Password",
     "ENTRA": "ENTER",
-    "Password errata.": "Wrong password."
+    "Password errata.": "Wrong password.",
+    "LICENSE_SECRET troppo corta (minimo 32 caratteri): codici di prova disattivati.": "LICENSE_SECRET too short (minimum 32 characters): trial codes disabled.",
+    "password o codice di prova OTM-…": "password or trial code OTM-…",
+    "Codice di prova scaduto il {data}.": "Trial code expired on {data}.",
+    "Codice di prova revocato.": "Trial code revoked.",
+    "PROVA · {d}": "TRIAL · {d}",
+    "Licenza di prova: alla scadenza le viste si chiudono": "Trial licence: the views close when it expires",
+    "Licenza di prova scaduta": "Trial licence expired",
+    "Ricarica la pagina e inserisci un nuovo codice per continuare.": "Reload the page and enter a new code to continue."
   }
 }

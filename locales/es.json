@@ -41,6 +41,14 @@
     "APP_PASSWORD non configurata nei Secrets: accesso bloccato.": "APP_PASSWORD no configurada en los Secrets: acceso bloqueado.",
     "Password": "Contraseña",
     "ENTRA": "ENTRAR",
-    "Password errata.": "Contraseña incorrecta."
+    "Password errata.": "Contraseña incorrecta.",
+    "LICENSE_SECRET troppo corta (minimo 32 caratteri): codici di prova disattivati.": "LICENSE_SECRET demasiado corta (mínimo 32 caracteres): códigos de prueba desactivados.",
+    "password o codice di prova OTM-…": "contraseña o código de prueba OTM-…",
+    "Codice di prova scaduto il {data}.": "Código de prueba caducado el {data}.",
+    "Codice di prova revocato.": "Código de prueba revocado.",
+    "PROVA · {d}": "PRUEBA · {d}",
+    "Licenza di prova: alla scadenza le viste si chiudono": "Licencia de prueba: al vencer, las vistas se cierran",
+    "Licenza di prova scaduta": "Licencia de prueba vencida",
+    "Ricarica la pagina e inserisci un nuovo codice per continuare.": "Recarga la página e introduce un nuevo código para continuar."
   }
 }
