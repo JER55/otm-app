@@ -5,6 +5,7 @@
    traduzione in locales/en.json e locales/es.json; nessuna voce orfana, nessuna scartata.
 2. La schermata d'accesso compare nella lingua scelta (?lang=, Secrets, selettore).
 3. Con l'accesso fatto la shell si costruisce con lingua e testi delle tre lingue dentro.
+4. Titolo e logo della scheda: "Otmflow - OutThinkTheMarket" e favicon OTM.
 """
 import ast
 import json
@@ -76,12 +77,21 @@ class TestCataloghiCompleti(unittest.TestCase):
         src = _sorgente()
         self.assertIn("CARICAMENTO", testi_shell(src))
         self.assertIn("chiude tra {d}", testi_shell(src))
+        self.assertIn("FLUSSO 60s", testi_shell(src))
         self.assertIn("ENTRA", testi_python(src))
 
     def test_testi_shell_senza_virgolette_doppie(self):
         # finiscono in t("...") e in attributi HTML: una " li spezzerebbe
         for k in testi_shell(_sorgente()):
             self.assertNotIn('"', k)
+
+
+class TestIdentitaScheda(unittest.TestCase):
+    def test_titolo_e_logo(self):
+        src = _sorgente()
+        self.assertIn('APP_TITLE = "Otmflow - OutThinkTheMarket"', src)
+        self.assertIn("page_title=APP_TITLE", src)
+        self.assertIn("page_icon=_otm_icon()", src)
 
 
 @unittest.skipIf(AppTest is None, "Streamlit non installato")
@@ -152,27 +162,37 @@ class TestShell(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir, ignore_errors=True)
 
-    def _html(self, lang):
+    def _iframes(self, lang):
         at = AppTest.from_file(os.path.join(self.dir, "app.py"), default_timeout=30)
         at.secrets["APP_PASSWORD"] = "x"
         at.session_state["otm_auth"] = True
         at.query_params["lang"] = lang
         at.run()
         self.assertFalse(at.exception)
-        iframes = [e for e in at.main if getattr(e, "type", "") == "iframe"]
-        self.assertEqual(len(iframes), 1)
-        return iframes[0].proto.srcdoc
+        return [e.proto.srcdoc for e in at.main if getattr(e, "type", "") == "iframe"]
+
+    def _html(self, lang):
+        shell = [s for s in self._iframes(lang) if "var OTM_I18N" in s]
+        self.assertEqual(len(shell), 1)
+        return shell[0]
 
     def test_shell_in_spagnolo(self):
         html = self._html("es")
         self.assertIn('<html lang="es">', html)
         self.assertNotIn("%%LANG%%", html)
         self.assertNotIn("%%I18N%%", html)
+        self.assertNotIn("%%MARK%%", html)
         i18n = json.loads(re.search(r"var OTM_I18N = (\{.*?\});</script>", html).group(1))
         self.assertEqual(set(i18n), {"it", "en", "es"})
         self.assertEqual(i18n["es"]["CARICAMENTO"], "CARGANDO")
         self.assertEqual(i18n["en"]["chiude tra {d}"], "closes in {d}")
         self.assertEqual(i18n["it"]["CHIUSA"], "CHIUSA")
+        self.assertEqual(i18n["es"]["FLUSSO 60s"], "FLUJO 60s")
+
+    def test_componente_identita_scheda(self):
+        ident = [s for s in self._iframes("it") if "data:image/svg+xml" in s and "OTM_I18N" not in s]
+        self.assertEqual(len(ident), 1)
+        self.assertIn('"Otmflow - OutThinkTheMarket"', ident[0])
 
     def test_viste_ricevono_lingua_catalogo_e_traduttore(self):
         html = self._html("en")

@@ -2,7 +2,7 @@
   "_info": {
     "lingua": "en",
     "nome": "English",
-    "app": "OTM · Order Flow",
+    "app": "Otmflow - OutThinkTheMarket",
     "note": "Key = Italian text in the code. Keep {placeholders} and HTML tags identical, otherwise the entry is discarded and Italian is shown."
   },
   "messaggi": {
@@ -22,6 +22,11 @@
     "Comandi grafico (?)": "Chart shortcuts (?)",
     "Schermo intero (F)": "Full screen (F)",
     "CARICAMENTO": "LOADING",
+    "BTCUSDT perpetuo · ultimo prezzo, variazione 24h e flusso aggressori degli ultimi 60 secondi (Binance Futures, dal tuo browser)": "BTCUSDT perpetual · last price, 24h change and aggressor flow over the last 60 seconds (Binance Futures, from your browser)",
+    "FLUSSO 60s": "FLOW 60s",
+    "connessione…": "connecting…",
+    "feed non disponibile": "feed unavailable",
+    "acquisti {b}% · vendite {s}%": "buys {b}% · sells {s}%",
     "Carico le viste…": "Loading views…",
     "Impossibile caricare le viste: {errore}": "Unable to load the views: {errore}",
     "Tag di session-volume-profile.js non trovato nella Footprint: SVP non caricato.": "session-volume-profile.js tag not found in the Footprint: SVP not loaded.",

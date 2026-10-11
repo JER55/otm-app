@@ -1,12 +1,12 @@
 """
-OUTTHINK THE MARKET — shell Streamlit
---------------------------------------
+OUTTHINK THE MARKET — Otmflow, shell Streamlit
+-----------------------------------------------
 Incorpora le due app JS (FakeMove E/L/C e Footprint). Rendering e websocket
 restano nel browser: i dati arrivano dal tuo IP (Italia), non dal server
 Streamlit (USA, bloccato da Binance/Bybit).
 
 Struttura lato browser:
-  componente Streamlit  ->  shell (barra, tab, orologio sessione USA, fullscreen)
+  componente Streamlit  ->  shell (barra, tab, ticker BTC, sessione USA, fullscreen)
                               ├─ iframe FakeMove    (vista iniziale)
                               └─ iframe Footprint   (precaricato in background, sospeso)
 Il cambio vista e' istantaneo: entrambe le viste sono vive; quella in background
@@ -18,6 +18,11 @@ Adattamenti applicati qui al caricamento delle viste:
   2. otm-nav.js (motore di navigazione) inserito in entrambe le viste
   3. rilevamento "localhost" letto dalla pagina principale (non dall'iframe)
   4. in cloud le chiamate di esecuzione (proxy/Netlify) vengono bloccate
+
+Identita' della scheda del browser:
+  * titolo "Otmflow - OutThinkTheMarket" e logo OTM (page_icon generato con Pillow, nessun file);
+  * un componente invisibile riallinea titolo e icona SVG anche sulla pagina esterna
+    (su Streamlit Cloud il titolo altrimenti diventa "… · Streamlit").
 
 Lingue (IT · EN · ES, con traduzioni.py e locales/*.json — stesso sistema di ThinkCore):
   * testi Python con tr("..."); testi della shell con t("...") / data-i18n="..." nell'HTML:
@@ -35,6 +40,7 @@ Lingue (IT · EN · ES, con traduzioni.py e locales/*.json — stesso sistema di
 import hashlib
 import json
 import re
+import urllib.parse
 from pathlib import Path
 
 import streamlit as st
@@ -47,19 +53,73 @@ tr = tz.tr
 BASE = Path(__file__).parent
 VIEWS = BASE / "views"
 
+APP_TITLE = "Otmflow - OutThinkTheMarket"
+
 # ── Design system (stesso di ThinkCore) ─────────────────────────────────────
 INK = "#0B1220"
 SURFACE = "#111C2E"
 ELEVATED = "#16233A"
 TEAL = "#3DD4C8"
+SKY = "#6FA8FF"
 MUTED = "#8394B0"
 LIGHT = "#E8EEF9"
 AMBER = "#F2A93B"
 CRIMSON = "#FF5C5C"
 
+# ── Logo OTM ────────────────────────────────────────────────────────────────
+# Il range (anello) con il punto che ne evade in alto a destra: il breakout, cioe' "outthink".
+# Al centro una candela. Stessa geometria nell'SVG (barra, login, favicon) e nel PNG (page_icon).
+OTM_MARK_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">'
+    '<defs>'
+    '<linearGradient id="otmG" x1="5" y1="27" x2="27" y2="5" gradientUnits="userSpaceOnUse">'
+    f'<stop offset="0" stop-color="{TEAL}"/><stop offset="1" stop-color="{SKY}"/></linearGradient>'
+    '<linearGradient id="otmB" x1="0" y1="0" x2="0" y2="32" gradientUnits="userSpaceOnUse">'
+    '<stop offset="0" stop-color="#13213A"/><stop offset="1" stop-color="#070D18"/></linearGradient>'
+    '</defs>'
+    f'<rect x="1" y="1" width="30" height="30" rx="8" fill="url(#otmB)" stroke="{TEAL}" stroke-opacity=".38"/>'
+    '<circle cx="16" cy="16" r="9.5" fill="none" stroke="url(#otmG)" stroke-width="2.6" stroke-linecap="round"'
+    ' stroke-dasharray="51.4 8.3" transform="rotate(-20 16 16)"/>'
+    f'<circle class="otm-dot" cx="24.5" cy="7.5" r="2" fill="{SKY}"/>'
+    f'<path d="M16 11.2V20.8" stroke="{TEAL}" stroke-width="1.3" stroke-linecap="round"/>'
+    f'<rect x="14.1" y="13.4" width="3.8" height="5.2" rx="1" fill="{TEAL}"/>'
+    '</svg>'
+)
+FAVICON_URL = "data:image/svg+xml," + urllib.parse.quote(OTM_MARK_SVG)
+
+
+def _otm_icon():
+    """Logo OTM in PNG per page_icon (Pillow e' gia' una dipendenza di Streamlit)."""
+    try:
+        from PIL import Image, ImageDraw
+    except Exception:
+        return "📊"
+    S = 256
+    hexrgb = lambda h, a=255: tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) + (a,)
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle((8, 8, S - 8, S - 8), radius=60, fill=hexrgb("#0B1426"),
+                        outline=hexrgb(TEAL, 110), width=7)
+    # anello con gradiente diagonale teal -> sky, aperto in alto a destra
+    mask = Image.new("L", (S, S), 0)
+    ImageDraw.Draw(mask).arc((52, 52, 204, 204), start=-20, end=290, fill=255, width=22)
+    grad = Image.new("RGBA", (S, S))
+    a, b = hexrgb(TEAL), hexrgb(SKY)
+    gp = grad.load()
+    for y in range(S):
+        for x in range(S):
+            t = max(0.0, min(1.0, (x + (S - y)) / (2 * S)))
+            gp[x, y] = tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(4))
+    img.paste(grad, (0, 0), mask)
+    d.ellipse((196 - 17, 60 - 17, 196 + 17, 60 + 17), fill=hexrgb(SKY))      # il breakout
+    d.rounded_rectangle((124, 88, 132, 168), radius=4, fill=hexrgb(TEAL))    # stoppino
+    d.rounded_rectangle((112, 107, 144, 149), radius=8, fill=hexrgb(TEAL))   # corpo
+    return img.resize((64, 64), Image.LANCZOS)
+
+
 st.set_page_config(
-    page_title="OTM · Order Flow",
-    page_icon="📊",
+    page_title=APP_TITLE,
+    page_icon=_otm_icon(),
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -74,14 +134,57 @@ html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 .block-container {{ padding:0.25rem 0.4rem 0 0.4rem !important; max-width:100% !important; }}
 [data-testid="stMainBlockContainer"] {{ padding-top:0.25rem !important; }}
 [data-testid="stVerticalBlock"] {{ gap:0 !important; }}
-.otm-brand {{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem;
-             letter-spacing:.08em; color:{LIGHT}; }}
-.otm-brand span {{ color:{TEAL}; }}
+[data-testid="stElementContainer"]:has(iframe[height="0"]) {{ display:none; }}
+.otm-brand {{ display:flex; flex-direction:column; align-items:center; gap:14px; }}
+.otm-brand svg {{ width:64px; height:64px; filter:drop-shadow(0 0 22px rgba(61,212,200,.35)); }}
+.otm-brand b {{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.6rem;
+               letter-spacing:.06em; color:{LIGHT}; }}
+.otm-brand b span {{ background:linear-gradient(90deg,{TEAL},{SKY}); -webkit-background-clip:text;
+                    background-clip:text; color:transparent; }}
+.otm-brand small {{ font-family:'Space Grotesk',sans-serif; font-size:.68rem; letter-spacing:.42em;
+                   color:{MUTED}; margin-top:-8px; }}
 iframe {{ border:1px solid {ELEVATED} !important; border-radius:10px; background:#050a12; display:block; }}
 </style>
 """,
     unsafe_allow_html=True,
 )
+
+
+# ── Titolo e icona della scheda ─────────────────────────────────────────────
+# Componente invisibile: tiene titolo e favicon SVG sulla pagina dell'app e, se raggiungibile,
+# sulla pagina esterna (Streamlit Cloud). Streamlit li reimposta a ogni rerun: un observer li riallinea.
+_IDENTITY_HTML = """<script>
+(function () {
+  var T = %%TITLE%%, ICON = %%ICON%%;
+  function apply(w) {
+    try {
+      var d = w.document; if (!d || !d.head) return;
+      if (d.title !== T) d.title = T;
+      d.querySelectorAll('link[rel~="icon"]:not([data-otm])').forEach(function (l) { l.parentNode.removeChild(l); });
+      var l = d.querySelector('link[data-otm]');
+      if (!l) { l = d.createElement('link'); l.rel = 'icon'; l.type = 'image/svg+xml'; l.setAttribute('data-otm', '1'); d.head.appendChild(l); }
+      if (l.getAttribute('href') !== ICON) l.setAttribute('href', ICON);
+    } catch (e) {}
+  }
+  var wins = [];
+  [window.parent, window.top].forEach(function (w) { if (w && w !== window && wins.indexOf(w) < 0) wins.push(w); });
+  wins.forEach(function (w) {
+    apply(w);
+    try {
+      var busy = false;
+      new w.MutationObserver(function () {
+        if (busy) return; busy = true;
+        setTimeout(function () { busy = false; apply(w); }, 0);
+      }).observe(w.document.head, { childList: true, subtree: true, characterData: true, attributes: true });
+    } catch (e) {}
+  });
+})();
+</script>"""
+
+
+def _tab_identity() -> None:
+    components.html(_IDENTITY_HTML.replace("%%TITLE%%", json.dumps(APP_TITLE))
+                    .replace("%%ICON%%", json.dumps(FAVICON_URL)), height=0)
 
 
 # ── Rilevamento ambiente (lato server, solo per il badge) ───────────────────
@@ -239,8 +342,9 @@ def _blob(html: str) -> str:
 
 @st.cache_data(show_spinner=False, ttl=900)
 def _build_shell(_key: float, local: bool, _shell_ver: str) -> str:
-    # _shell_ver = hash di SHELL_HTML: se modifichi la shell la cache si invalida subito
+    # _shell_ver = hash di SHELL_HTML + logo: se modifichi la shell la cache si invalida subito
     return (SHELL_HTML
+            .replace("%%MARK%%", OTM_MARK_SVG)
             .replace("%%LOCAL%%", "true" if local else "false")
             .replace("%%FP%%", _blob(_build_view("footprint")))
             .replace("%%FM%%", _blob(_build_view("fakemove"))))
@@ -270,7 +374,7 @@ def load_shell(local: bool, lang: str) -> str:
             key = max(key, extra.stat().st_mtime)
         except OSError:
             pass
-    ver = hashlib.sha1(SHELL_HTML.encode()).hexdigest()[:12]
+    ver = hashlib.sha1((SHELL_HTML + OTM_MARK_SVG).encode()).hexdigest()[:12]
     try:
         with st.spinner(tr("Carico le viste…")):
             html = _build_shell(key, local, ver)
@@ -287,49 +391,130 @@ SHELL_HTML = r"""<!doctype html>
 <html lang="%%LANG%%"><head><meta charset="utf-8">
 <script>var OTM_I18N = %%I18N%%;</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#0B1220;--surf:#111C2E;--elev:#16233A;--teal:#3DD4C8;--muted:#8394B0;--light:#E8EEF9;--amber:#F2A93B;--red:#FF5C5C;--hh:34px;}
+  :root{--ink:#0B1220;--surf:#111C2E;--elev:#16233A;--teal:#3DD4C8;--sky:#6FA8FF;--muted:#8394B0;--dim:#56657F;
+    --light:#E8EEF9;--amber:#F2A93B;--red:#FF5C5C;--green:#2EE6A6;--hh:44px;
+    --glass:rgba(255,255,255,.035);--line:rgba(255,255,255,.07)}
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:#050a12;overflow:hidden;color:var(--light);font-family:Inter,system-ui,sans-serif}
   #shell{display:flex;flex-direction:column;height:100%}
-  header{height:var(--hh);flex:0 0 var(--hh);display:flex;align-items:center;gap:12px;padding:0 6px 0 10px;
-    background:linear-gradient(180deg,#0f1828,#0b1220);border-bottom:1px solid var(--elev)}
-  .brand{font:700 12px 'Space Grotesk',sans-serif;letter-spacing:.1em;white-space:nowrap}
-  .brand span{color:var(--teal)}
-  nav{position:relative;display:flex;background:#0a111d;border:1px solid var(--elev);border-radius:8px;padding:2px}
-  nav button{all:unset;cursor:pointer;position:relative;z-index:1;padding:3px 11px;border-radius:6px;line-height:18px;
-    font:700 10.5px/18px 'Space Grotesk',sans-serif;letter-spacing:.09em;color:var(--muted);transition:color .15s;white-space:nowrap}
+
+  /* ── barra ─────────────────────────────────────────────────────────── */
+  header{position:relative;isolation:isolate;overflow:hidden;height:var(--hh);flex:0 0 var(--hh);
+    display:flex;align-items:center;gap:12px;padding:0 8px 0 9px;
+    background:
+      radial-gradient(420px 90px at 0% 0%,rgba(61,212,200,.16),transparent 70%),
+      radial-gradient(520px 90px at 100% 0%,rgba(111,168,255,.10),transparent 70%),
+      linear-gradient(180deg,#0f1a2b 0%,#0a111e 100%);
+    border-bottom:1px solid rgba(61,212,200,.12)}
+  header::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+    background-size:18px 18px;background-position:-1px -1px;
+    -webkit-mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.25) 22%,transparent 45%,transparent 60%,rgba(0,0,0,.4) 100%);
+            mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.25) 22%,transparent 45%,transparent 60%,rgba(0,0,0,.4) 100%)}
+  /* linea di "sweep": una passata di liquidita' che attraversa la barra */
+  header::after{content:'';position:absolute;left:0;bottom:-1px;width:28%;height:1px;pointer-events:none;
+    background:linear-gradient(90deg,transparent,var(--teal) 55%,var(--sky) 80%,transparent);
+    box-shadow:0 0 10px 1px rgba(61,212,200,.45);transform:translateX(-110%);animation:sweep 7s cubic-bezier(.65,0,.35,1) infinite}
+  @keyframes sweep{0%{transform:translateX(-110%)}60%,100%{transform:translateX(370%)}}
+
+  .brand{display:flex;align-items:center;gap:9px;flex:0 0 auto;text-decoration:none;color:inherit;user-select:none}
+  .brand svg{width:28px;height:28px;display:block;filter:drop-shadow(0 0 8px rgba(61,212,200,.35));transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .brand:hover svg{transform:rotate(-8deg) scale(1.06)}
+  .brand .otm-dot{transform-origin:24.5px 7.5px;animation:breakout 3.2s ease-in-out infinite}
+  @keyframes breakout{0%,100%{transform:translate(0,0);opacity:1}45%{transform:translate(1.1px,-1.1px);opacity:1}55%{opacity:.55}}
+  .wm{display:flex;flex-direction:column;line-height:1}
+  .wm b{font:700 15px/1 'Space Grotesk',sans-serif;letter-spacing:.05em;color:var(--light)}
+  .wm b span{background:linear-gradient(90deg,var(--teal),var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .wm small{margin-top:4px;font:600 7.5px/1 'Space Grotesk',sans-serif;letter-spacing:.34em;color:var(--dim);white-space:nowrap}
+  .sep{width:1px;height:22px;background:linear-gradient(180deg,transparent,var(--line),transparent);flex:0 0 1px}
+
+  nav{position:relative;display:flex;background:var(--glass);border:1px solid var(--line);border-radius:10px;padding:3px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+  nav button{all:unset;cursor:pointer;position:relative;z-index:1;padding:4px 12px;border-radius:7px;
+    font:700 10.5px/18px 'Space Grotesk',sans-serif;letter-spacing:.1em;color:var(--muted);transition:color .18s;white-space:nowrap}
   nav button:hover{color:var(--light)}
   nav button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
-  nav button.on{color:#06110f}
-  nav button kbd{font:700 9px 'JetBrains Mono',monospace;margin-left:6px;opacity:.5}
+  nav button.on{color:#04110f}
+  nav button kbd{font:700 9px 'JetBrains Mono',monospace;margin-left:7px;padding:0 4px;border-radius:3px;
+    background:rgba(255,255,255,.08);opacity:.55}
   nav button .ld{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:6px;vertical-align:1px;background:currentColor;opacity:0;transition:opacity .2s}
   nav button.loading .ld{opacity:.7;animation:blink .8s infinite}
   @keyframes blink{50%{opacity:.15}}
-  nav .ink{position:absolute;top:2px;bottom:2px;left:0;border-radius:6px;background:var(--teal);
-    box-shadow:0 0 14px rgba(61,212,200,.3);transition:transform .22s cubic-bezier(.2,.8,.2,1),width .22s cubic-bezier(.2,.8,.2,1)}
+  nav .ink{position:absolute;top:3px;bottom:3px;left:0;border-radius:7px;
+    background:linear-gradient(135deg,#46e0d3 0%,var(--teal) 45%,#59b4f2 100%);
+    box-shadow:0 0 18px rgba(61,212,200,.35),inset 0 1px 0 rgba(255,255,255,.35);
+    transition:transform .24s cubic-bezier(.2,.8,.2,1),width .24s cubic-bezier(.2,.8,.2,1)}
   nav.noanim .ink{transition:none}
-  .sp{flex:1}
-  .chip{display:flex;align-items:center;gap:6px;font:600 10.5px Inter,sans-serif;color:var(--muted);white-space:nowrap}
-  .chip b{font:700 11px 'JetBrains Mono',monospace;color:var(--light);letter-spacing:.02em}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
-  .dot.open{background:var(--teal);box-shadow:0 0 0 0 rgba(61,212,200,.6);animation:pulse 1.8s infinite}
+
+  /* ── ticker BTC: prezzo, 24h, flusso aggressori 60 s ── */
+  .tick{display:flex;align-items:center;gap:10px;height:30px;padding:0 11px 0 9px;border-radius:9px;
+    background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);white-space:nowrap;cursor:default}
+  .sym{display:flex;align-items:center;gap:6px;font:700 10.5px 'Space Grotesk',sans-serif;letter-spacing:.08em;color:var(--light)}
+  .sym em{font:600 8px 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.06em;color:var(--dim);
+    padding:1px 4px;border:1px solid var(--line);border-radius:3px}
+  .tdot{width:6px;height:6px;border-radius:50%;background:var(--dim)}
+  .tdot.on{background:var(--green);animation:pulse 1.8s infinite}
+  .px{font:700 13px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--light);
+    min-width:78px;text-align:right;transition:color .5s ease,text-shadow .5s ease}
+  .px.up{color:var(--green);text-shadow:0 0 12px rgba(46,230,166,.45);transition:none}
+  .px.dn{color:var(--red);text-shadow:0 0 12px rgba(255,92,92,.45);transition:none}
+  .chg{font:600 10.5px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--muted);
+    padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.04)}
+  .chg.up{color:var(--green);background:rgba(46,230,166,.09)}
+  .chg.dn{color:var(--red);background:rgba(255,92,92,.09)}
+  .flow{display:flex;align-items:center;gap:7px;padding-left:10px;border-left:1px solid var(--line)}
+  .fl{font:700 8.5px 'Space Grotesk',sans-serif;letter-spacing:.16em;color:var(--dim)}
+  .bar{position:relative;width:78px;height:5px;border-radius:3px;overflow:hidden;background:rgba(255,92,92,.75);
+    box-shadow:0 0 10px rgba(0,0,0,.4) inset}
+  .bar i{position:absolute;left:0;top:0;bottom:0;width:50%;background:linear-gradient(90deg,#1fc58d,var(--green));
+    transition:width .45s cubic-bezier(.2,.8,.2,1);box-shadow:2px 0 6px rgba(46,230,166,.6)}
+  .bar::after{content:'';position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:rgba(255,255,255,.55)}
+  .bar.idle{background:rgba(255,255,255,.08)} .bar.idle i{opacity:0}
+  .fd{font:700 10.5px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;min-width:52px;color:var(--muted)}
+  .fd.up{color:var(--green)} .fd.dn{color:var(--red)}
+
+  .sp{flex:1;min-width:0}
+  header>*:not(.sp){flex-shrink:0}
+
+  /* ── sessione USA con avanzamento ── */
+  .sess{position:relative;display:flex;align-items:center;gap:7px;height:30px;padding:0 10px;border-radius:9px;
+    border:1px solid var(--line);background:var(--glass);font:600 10.5px Inter,sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;cursor:default}
+  .sess b{font:700 10.5px 'Space Grotesk',sans-serif;letter-spacing:.08em;color:var(--light)}
+  .sess .nx{font:600 10px 'JetBrains Mono',monospace;color:var(--muted)}
+  .sess .tr{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.04)}
+  .sess .tr i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--sky));transition:width 1s linear}
+  .sess.pre .tr i{background:linear-gradient(90deg,#c9801f,var(--amber))}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--dim)}
+  .dot.open{background:var(--teal);animation:pulse 1.8s infinite}
   .dot.pre{background:var(--amber)}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,212,200,.55)}70%{box-shadow:0 0 0 6px rgba(61,212,200,0)}100%{box-shadow:0 0 0 0 rgba(61,212,200,0)}}
-  .pill{font:700 9.5px 'JetBrains Mono',monospace;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap;cursor:default}
+
+  .clk{display:flex;flex-direction:column;align-items:flex-end;line-height:1;cursor:default}
+  .clk small{font:700 7.5px 'Space Grotesk',sans-serif;letter-spacing:.3em;color:var(--dim)}
+  .clk b{margin-top:3px;font:700 13px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--light)}
+
+  .pill{display:flex;align-items:center;gap:6px;font:700 9px 'JetBrains Mono',monospace;letter-spacing:.06em;padding:4px 9px;
+    border-radius:999px;border:1px solid;white-space:nowrap;cursor:default}
+  .pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
   .pill.live{color:var(--red);border-color:rgba(255,92,92,.4);background:rgba(255,92,92,.08)}
-  .pill.safe{color:var(--teal);border-color:rgba(61,212,200,.4);background:rgba(61,212,200,.08)}
-  .lang{display:flex;background:#0a111d;border:1px solid var(--elev);border-radius:7px;padding:1px}
-  .lang button{all:unset;cursor:pointer;padding:1px 6px;border-radius:5px;color:var(--muted);
+  .pill.live::before{animation:blink 1.2s infinite}
+  .pill.safe{color:var(--teal);border-color:rgba(61,212,200,.35);background:rgba(61,212,200,.07)}
+
+  .lang{display:flex;background:var(--glass);border:1px solid var(--line);border-radius:8px;padding:2px}
+  .lang button{all:unset;cursor:pointer;padding:2px 7px;border-radius:6px;color:var(--muted);
     font:700 9.5px/16px 'JetBrains Mono',monospace;letter-spacing:.04em;transition:color .15s,background .15s}
   .lang button:hover:not(.on){color:var(--light)}
   .lang button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
-  .lang button.on{color:#06110f;background:var(--teal)}
-  .ib{all:unset;cursor:pointer;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:var(--muted);
-    border:1px solid transparent;transition:all .15s}
-  .ib:hover{color:var(--light);background:rgba(61,212,200,.1);border-color:rgba(61,212,200,.25)}
+  .lang button.on{color:#04110f;background:linear-gradient(135deg,var(--teal),#59b4f2)}
+  .ib{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--muted);
+    border:1px solid var(--line);background:var(--glass);transition:all .15s}
+  .ib:hover{color:var(--light);background:rgba(61,212,200,.1);border-color:rgba(61,212,200,.3)}
+  .ib:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
   .ib svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
   #stage{position:relative;flex:1;min-height:0;background:#050a12}
   /* dissolvenza incrociata: la vista uscente resta visibile finche' non e' sfumata */
   iframe.view{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;visibility:hidden;pointer-events:none;
@@ -337,24 +522,38 @@ SHELL_HTML = r"""<!doctype html>
   iframe.view.on{opacity:1;visibility:visible;pointer-events:auto;z-index:1;transition:opacity .14s ease,visibility 0s}
   #loader{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
   #loader.on{display:grid}
-  #loader div{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.2em;color:var(--muted)}
+  #loader div{display:flex;flex-direction:column;align-items:center;font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.2em;color:var(--muted)}
+  #loader svg{width:40px;height:40px;margin-bottom:14px;animation:breathe 1.6s ease-in-out infinite}
+  @keyframes breathe{50%{opacity:.45;transform:scale(.94)}}
   #loader i{display:block;width:180px;height:2px;margin-top:12px;background:linear-gradient(90deg,transparent,var(--teal),transparent);
     background-size:200% 100%;animation:sh 1.1s linear infinite}
   @keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
+
+  @media (max-width:1580px){.hide-xl{display:none}}
+  @media (max-width:1340px){.hide-l{display:none}}
+  @media (max-width:1120px){.hide-t{display:none}}
   @media (max-width:980px){.hide-m{display:none}}
-  @media (max-width:640px){.brand{display:none} nav button{padding:3px 8px} nav button kbd{display:none}}
+  @media (max-width:640px){.wm,.sep{display:none} nav button{padding:3px 8px} nav button kbd{display:none}}
+  @media (prefers-reduced-motion:reduce){header::after,.brand .otm-dot,.tdot.on,.dot.open{animation:none}}
 </style></head>
 <body><div id="shell">
   <header>
-    <div class="brand">OTM <span>· ORDER FLOW</span></div>
+    <div class="brand" title="Otmflow · OutThink The Market">%%MARK%%<div class="wm"><b>OTM<span>FLOW</span></b><small>OUTTHINK THE MARKET</small></div></div>
+    <span class="sep"></span>
     <nav id="tabs" class="noanim" role="tablist">
       <i class="ink"></i>
       <button role="tab" data-v="fakemove">FAKEMOVE E/L/C<i class="ld"></i><kbd>[</kbd></button>
       <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd>]</kbd></button>
     </nav>
+    <div class="tick hide-t" id="tick" data-i18n-title="BTCUSDT perpetuo · ultimo prezzo, variazione 24h e flusso aggressori degli ultimi 60 secondi (Binance Futures, dal tuo browser)">
+      <span class="sym"><i class="tdot" id="tlive"></i>BTC<em>PERP</em></span>
+      <b class="px" id="tpx">—</b>
+      <span class="chg" id="tch">—</span>
+      <span class="flow hide-l" id="tflow"><span class="fl" data-i18n="FLUSSO 60s"></span><span class="bar idle" id="tbar"><i id="tbuy"></i></span><span class="fd" id="tfd">—</span></span>
+    </div>
     <div class="sp"></div>
-    <div class="chip hide-m" id="sess" data-i18n-title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)"><span class="dot" id="sdot"></span><span>US <b id="sst"></b> · <span id="snext"></span></span></div>
-    <div class="chip hide-m" data-i18n-title="Ora di Roma"><span data-i18n="ROMA"></span> <b id="clock">--:--:--</b></div>
+    <div class="sess hide-xl" id="sess" data-i18n-title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)"><span class="dot" id="sdot"></span><span>US <b id="sst"></b></span><span class="nx" id="snext"></span><span class="tr"><i id="sbar"></i></span></div>
+    <div class="clk hide-m" data-i18n-title="Ora di Roma"><small data-i18n="ROMA"></small><b id="clock">--:--:--</b></div>
     <span class="pill" id="mode"></span>
     <div class="lang" id="lang" role="radiogroup" data-i18n-title="Lingua">
       <button role="radio" data-l="it" title="Italiano">IT</button>
@@ -364,7 +563,7 @@ SHELL_HTML = r"""<!doctype html>
     <button class="ib" id="b-help" data-i18n-title="Comandi grafico (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg></button>
     <button class="ib" id="b-fs" data-i18n-title="Schermo intero (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   </header>
-  <main id="stage"><div id="loader"><div><span data-i18n="CARICAMENTO"></span><i></i></div></div></main>
+  <main id="stage"><div id="loader"><div>%%MARK%%<span data-i18n="CARICAMENTO"></span><i></i></div></div></main>
 </div>
 <script type="application/json" id="v-fakemove">%%FM%%</script>
 <script type="application/json" id="v-footprint">%%FP%%</script>
@@ -377,6 +576,7 @@ SHELL_HTML = r"""<!doctype html>
   var stage = document.getElementById('stage'), loader = document.getElementById('loader');
   var tabs = document.getElementById('tabs'), ink = tabs.querySelector('.ink');
   var cur = null, pseudo = false, lastCycle = 0;
+  var LOCALE = { it: 'it-IT', en: 'en-US', es: 'es-ES' };
 
   // ── lingua: testi da OTM_I18N (generato in Python dai cataloghi locales/*.json) ──
   var LANG = OTM_I18N[document.documentElement.lang] ? document.documentElement.lang : 'it';
@@ -391,14 +591,16 @@ SHELL_HTML = r"""<!doctype html>
     document.documentElement.lang = LANG;
     document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
     document.querySelectorAll('[data-i18n-title]').forEach(function (el) { el.title = t(el.getAttribute('data-i18n-title')); });
-    mode.textContent = LOCAL ? t("● LOCALE · LIVE") : t("● CLOUD · ANALISI");
+    mode.textContent = LOCAL ? t("● LOCALE · LIVE").replace(/^●\s*/, '') : t("● CLOUD · ANALISI").replace(/^●\s*/, '');
     mode.title = LOCAL ? t("Ordini reali tramite local-bitget-proxy.js (tetto 0,1 BTC)")
                        : t("Esecuzione disattivata: per operare usa l'app in locale con il proxy");
     document.querySelectorAll('#lang button').forEach(function (b) {
       var on = b.getAttribute('data-l') === LANG;
       b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
     });
+    if (typeof setFormats === 'function') setFormats();
     if (typeof tick === 'function') tick();
+    if (typeof paintTicker === 'function') paintTicker(true);
     if (typeof moveInk === 'function') moveInk();
   }
   function pushLang(n) {                          // la vista riceve la lingua (variabile + evento + setLang)
@@ -425,7 +627,7 @@ SHELL_HTML = r"""<!doctype html>
   function win(n) { return V[n].f && V[n].f.contentWindow; }
   function nav(n) { var w = win(n); return w && w.OTMNav && w.OTMNav.instance; }
   function btn(n) { return tabs.querySelector('button[data-v="' + n + '"]'); }
-  function editable(t) { return t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)); }
+  function editable(el) { return el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)); }
 
   function applySuspend() {
     ORDER.forEach(function (n) {
@@ -492,8 +694,8 @@ SHELL_HTML = r"""<!doctype html>
     if (V[n].ready) focusView(n, 30);
   }
   function cycle(d) {
-    var t = Date.now(); if (t - lastCycle < 150) return;   // evita doppio scatto (shell + vista)
-    lastCycle = t;
+    var now = Date.now(); if (now - lastCycle < 150) return;   // evita doppio scatto (shell + vista)
+    lastCycle = now;
     var i = ORDER.indexOf(cur); show(ORDER[(i + d + ORDER.length) % ORDER.length]);
   }
 
@@ -530,8 +732,93 @@ SHELL_HTML = r"""<!doctype html>
     } catch (e) {}
   }
   try { window.top.addEventListener('resize', fit); } catch (e) {}
-  [0, 150, 600, 1500, 3000].forEach(function (t) { setTimeout(fit, t); });
+  [0, 150, 600, 1500, 3000].forEach(function (ms) { setTimeout(fit, ms); });
   window.addEventListener('resize', moveInk);
+
+  // ── ticker BTCUSDT perp: websocket Binance Futures aperto dal browser (IP dell'utente) ──
+  // Prezzo dall'ultimo aggTrade, variazione 24h dal ticker, flusso aggressori = volume
+  // eseguito a mercato in acquisto vs vendita negli ultimi 60 s (bucket da 1 s, orologio dell'exchange).
+  // E' contesto di mercato, non un segnale.
+  var TK = { px: null, prev: null, chg: null, buy: new Float64Array(60), sell: new Float64Array(60),
+             sec: 0, off: 0, ws: null, ok: false, fails: 0, last: 0, flashT: 0 };
+  var fmtPx, fmtPct, fmtQty;
+  function setFormats() {
+    var loc = LOCALE[LANG] || 'it-IT';
+    fmtPx = new Intl.NumberFormat(loc, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: 'always' });
+    fmtPct = new Intl.NumberFormat(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'always' });
+    fmtQty = new Intl.NumberFormat(loc, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'always' });
+  }
+  try { setFormats(); } catch (e) {
+    fmtPx = { format: function (v) { return v.toFixed(1); } };
+    fmtPct = { format: function (v) { return (v >= 0 ? '+' : '') + v.toFixed(2); } };
+    fmtQty = fmtPct;
+  }
+  function roll(sec) {
+    if (!TK.sec) { TK.sec = sec; return; }
+    if (sec <= TK.sec) return;
+    for (var k = TK.sec + 1; k <= Math.min(sec, TK.sec + 60); k++) { TK.buy[k % 60] = 0; TK.sell[k % 60] = 0; }
+    TK.sec = sec;
+  }
+  function feed() {
+    if (!window.WebSocket) return;
+    var ws, dead = false;
+    function retry() {
+      if (dead) return; dead = true; TK.ok = false; TK.fails++;
+      try { ws.close(); } catch (e) {}
+      setTimeout(feed, Math.min(30000, 1000 * Math.pow(2, Math.min(TK.fails, 5))));
+    }
+    try { ws = new WebSocket('wss://fstream.binance.com/stream?streams=btcusdt@aggTrade/btcusdt@ticker'); }
+    catch (e) { TK.fails++; setTimeout(feed, 15000); return; }
+    TK.ws = ws;
+    ws.onmessage = function (ev) {
+      var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      var d = m && m.data; if (!d) return;
+      TK.ok = true; TK.fails = 0; TK.last = Date.now();
+      if (d.e === 'aggTrade') {
+        var q = +d.q, ts = +d.T;
+        TK.off = ts - Date.now();
+        var sec = Math.floor(ts / 1000); roll(sec);
+        if (sec > TK.sec - 60) { if (d.m) TK.sell[sec % 60] += q; else TK.buy[sec % 60] += q; }
+        TK.px = +d.p;
+      } else if (d.e === '24hrTicker') {
+        TK.chg = +d.P; if (TK.px == null) TK.px = +d.c;
+      }
+    };
+    ws.onerror = retry;
+    ws.onclose = retry;
+  }
+  var EL = { live: document.getElementById('tlive'), px: document.getElementById('tpx'), ch: document.getElementById('tch'),
+             bar: document.getElementById('tbar'), buy: document.getElementById('tbuy'), fd: document.getElementById('tfd'),
+             flow: document.getElementById('tflow') };
+  function txt(el, s) { if (el.textContent !== s) el.textContent = s; }
+  function cls(el, base, mod) { var c = base + (mod ? ' ' + mod : ''); if (el.className !== c) el.className = c; }
+  function paintTicker(force) {
+    var fresh = TK.ok && Date.now() - TK.last < 15000;
+    cls(EL.live, 'tdot', fresh ? 'on' : '');
+    if (TK.px == null) {
+      txt(EL.px, '—');
+      txt(EL.ch, TK.fails > 3 ? t("feed non disponibile") : t("connessione…")); cls(EL.ch, 'chg', '');
+      cls(EL.bar, 'bar', 'idle'); txt(EL.fd, '—'); cls(EL.fd, 'fd', '');
+      return;
+    }
+    if (TK.prev != null && TK.px !== TK.prev) {
+      cls(EL.px, 'px', TK.px > TK.prev ? 'up' : 'dn'); TK.flashT = Date.now();
+    } else if (Date.now() - TK.flashT > 450) cls(EL.px, 'px', '');
+    TK.prev = TK.px;
+    txt(EL.px, fmtPx.format(TK.px));
+    if (TK.chg != null) { txt(EL.ch, fmtPct.format(TK.chg) + '%'); cls(EL.ch, 'chg', TK.chg > 0 ? 'up' : TK.chg < 0 ? 'dn' : ''); }
+    roll(Math.floor((Date.now() + TK.off) / 1000));
+    var B = 0, S = 0;
+    for (var i = 0; i < 60; i++) { B += TK.buy[i]; S += TK.sell[i]; }
+    if (B + S <= 0) { cls(EL.bar, 'bar', 'idle'); txt(EL.fd, '—'); cls(EL.fd, 'fd', ''); return; }
+    var p = B / (B + S), dlt = B - S;
+    cls(EL.bar, 'bar', '');
+    EL.buy.style.width = (p * 100).toFixed(1) + '%';
+    txt(EL.fd, 'Δ ' + fmtQty.format(dlt));
+    cls(EL.fd, 'fd', dlt > 0 ? 'up' : dlt < 0 ? 'dn' : '');
+    var tip = t("acquisti {b}% · vendite {s}%", { b: Math.round(p * 100), s: 100 - Math.round(p * 100) });
+    if (EL.flow.title !== tip) EL.flow.title = tip;
+  }
 
   // ── orologio + sessione USA ──
   var fmtRome = new Intl.DateTimeFormat('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -545,19 +832,27 @@ SHELL_HTML = r"""<!doctype html>
     var wd = WD[o.weekday], mins = (+o.hour % 24) * 60 + (+o.minute) + (+o.second) / 60;
     var OPEN = 570, CLOSE = 960, PRE = 240, dot = document.getElementById('sdot');
     var st = document.getElementById('sst'), nx = document.getElementById('snext');
+    var box = document.getElementById('sess'), bar = document.getElementById('sbar');
     var weekday = wd >= 1 && wd <= 5;
     if (weekday && mins >= OPEN && mins < CLOSE) {
-      dot.className = 'dot open'; st.textContent = t("APERTA"); nx.textContent = t("chiude tra {d}", { d: dur(CLOSE - mins) }); return;
+      dot.className = 'dot open'; box.className = 'sess hide-xl open';
+      st.textContent = t("APERTA"); nx.textContent = t("chiude tra {d}", { d: dur(CLOSE - mins) });
+      bar.style.width = ((mins - OPEN) / (CLOSE - OPEN) * 100).toFixed(2) + '%';
+      return;
     }
     var until;
     if (weekday && mins < OPEN) until = OPEN - mins;
     else { var days = wd === 5 ? 3 : (wd === 6 ? 2 : 1); until = days * 1440 - mins + OPEN; }
     var pre = weekday && mins >= PRE && mins < OPEN;
     dot.className = 'dot' + (pre ? ' pre' : '');
+    box.className = 'sess hide-xl' + (pre ? ' pre' : '');
+    bar.style.width = pre ? ((mins - PRE) / (OPEN - PRE) * 100).toFixed(2) + '%' : '0%';
     st.textContent = pre ? t("PRE-MARKET") : t("CHIUSA");
     nx.textContent = t("apre tra {d}", { d: dur(until) });
   }
   applyLang(); setInterval(tick, 1000);
+  feed(); setInterval(paintTicker, 400);
+  window.addEventListener('pagehide', function () { try { TK.ws && TK.ws.close(); } catch (e) {} });
 
   // ── input ──
   // pointerdown invece di click: lo switch parte alla pressione, non al rilascio
@@ -613,8 +908,9 @@ def _require_login(is_local: bool) -> None:
 
     _, mid, _ = st.columns([1, 1.2, 1])
     with mid:
-        st.markdown('<div class="otm-brand" style="text-align:center;margin:10vh 0 18px">'
-                    'OUTTHINK <span>THE MARKET</span></div>', unsafe_allow_html=True)
+        st.markdown('<div class="otm-brand" style="margin:9vh 0 22px">' + OTM_MARK_SVG
+                    + '<b>OTM<span>FLOW</span></b><small>OUTTHINK THE MARKET</small></div>',
+                    unsafe_allow_html=True)
         with st.form("otm_login"):
             pwd = st.text_input(tr("Password"), type="password", key="otm_pwd")
             ok = st.form_submit_button(tr("ENTRA"), use_container_width=True)
@@ -627,6 +923,7 @@ def _require_login(is_local: bool) -> None:
     st.stop()
 
 
+_tab_identity()
 local = _is_local()
 _require_login(local)
 
