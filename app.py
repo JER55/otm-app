@@ -46,6 +46,7 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+import accesso_otm
 import traduzioni as tz
 
 tr = tz.tr
@@ -883,50 +884,19 @@ SHELL_HTML = r"""<!doctype html>
 </body></html>"""
 
 
-# ── Accesso con password ────────────────────────────────────────────────────
-# L'HTML delle viste (cioe' la logica della strategia) viene inviato al browser
-# SOLO dopo il login. Password in Streamlit Cloud: Settings > Secrets
-#   APP_PASSWORD = "la-tua-password"
+# ── Accesso ─────────────────────────────────────────────────────────────────
+# L'HTML delle viste (cioe' la logica della strategia) viene inviato al browser SOLO dopo
+# l'accesso (accesso_otm.py). Secrets in Streamlit Cloud: Settings > Secrets
+#   APP_PASSWORD   = "la-tua-password"   accesso del titolare, senza scadenza
+#   LICENSE_SECRET = "..."               chiave dei codici di prova (crea_licenza.py --nuova-chiave)
 # In locale senza secret l'accesso e' libero; in cloud senza secret l'app si blocca.
-def _require_login(is_local: bool) -> None:
-    import hmac
-    import time
-
-    try:
-        expected = st.secrets.get("APP_PASSWORD", "")
-    except Exception:
-        expected = ""
-    if (not expected and is_local) or st.session_state.get("otm_auth"):
-        return                    # dentro l'app la lingua si cambia dalla barra della shell
-
-    # selettore IT · EN · ES prima di ogni st.stop(): c'e' anche sulla schermata d'accesso
-    _, sel = st.columns([5, 1])
-    tz.selettore(sel)
-    if not expected:
-        st.error(tr("APP_PASSWORD non configurata nei Secrets: accesso bloccato."))
-        st.stop()
-
-    _, mid, _ = st.columns([1, 1.2, 1])
-    with mid:
-        st.markdown('<div class="otm-brand" style="margin:9vh 0 22px">' + OTM_MARK_SVG
-                    + '<b>OTM<span>FLOW</span></b><small>OUTTHINK THE MARKET</small></div>',
-                    unsafe_allow_html=True)
-        with st.form("otm_login"):
-            pwd = st.text_input(tr("Password"), type="password", key="otm_pwd")
-            ok = st.form_submit_button(tr("ENTRA"), use_container_width=True)
-        if ok:
-            if hmac.compare_digest(pwd.encode(), str(expected).encode()):
-                st.session_state["otm_auth"] = True
-                st.rerun()
-            time.sleep(1.5)  # rallenta i tentativi a forza bruta
-            st.error(tr("Password errata."))
-    st.stop()
 
 
 _tab_identity()
 local = _is_local()
-_require_login(local)
+scadenza = accesso_otm.richiedi_accesso(local, OTM_MARK_SVG)
 
 # Un solo componente: la shell gestisce tab, viste e schermo intero lato browser,
 # quindi nessun rerun di Streamlit quando cambi vista o ridimensioni.
-components.html(load_shell(local, tz.lingua_corrente()), height=860, scrolling=False)
+components.html(accesso_otm.con_scadenza(load_shell(local, tz.lingua_corrente()), scadenza),
+                height=860, scrolling=False)

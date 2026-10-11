@@ -56,7 +56,13 @@ def testi_shell(src):
 class TestCataloghiCompleti(unittest.TestCase):
     def setUp(self):
         src = _sorgente()
-        self.usati = testi_python(src) | testi_shell(src) | {"Lingua"}   # "Lingua": tz.selettore
+        with open(os.path.join(QUI, "accesso_otm.py"), encoding="utf-8") as f:
+            src_accesso = f.read()                     # login e scadenza vivono in accesso_otm.py
+        scadenza = next(ast.literal_eval(n.value) for n in ast.parse(src_accesso).body
+                        if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", None) == "TESTI_SCADENZA")
+        self.usati = (testi_python(src) | testi_python(src_accesso) | testi_shell(src)
+                      | {"Lingua"}                     # "Lingua": tz.selettore
+                      | set(scadenza))                 # testi del timer di scadenza (nel browser)
         self.cat = tz.Cataloghi(tz.CARTELLA_LOCALES, verifica_ogni_s=0)
 
     def test_nessun_testo_senza_traduzione(self):
@@ -78,7 +84,9 @@ class TestCataloghiCompleti(unittest.TestCase):
         self.assertIn("CARICAMENTO", testi_shell(src))
         self.assertIn("chiude tra {d}", testi_shell(src))
         self.assertIn("FLUSSO 60s", testi_shell(src))
-        self.assertIn("ENTRA", testi_python(src))
+        with open(os.path.join(QUI, "accesso_otm.py"), encoding="utf-8") as f:
+            self.assertIn("ENTRA", testi_python(f.read()))          # il login vive in accesso_otm.py
+        self.assertIn("Carico le viste…", testi_python(src))
 
     def test_testi_shell_senza_virgolette_doppie(self):
         # finiscono in t("...") e in attributi HTML: una " li spezzerebbe
@@ -143,7 +151,7 @@ class TestShell(unittest.TestCase):
 
     def setUp(self):
         self.dir = tempfile.mkdtemp(prefix="otm_st_")
-        for f in ("app.py", "traduzioni.py", "otm-i18n.js"):
+        for f in ("app.py", "traduzioni.py", "otm-i18n.js", "accesso_otm.py", "licenze_otm.py"):
             shutil.copy(os.path.join(QUI, f), self.dir)
         shutil.copytree(os.path.join(QUI, "locales"), os.path.join(self.dir, "locales"))
         v = os.path.join(self.dir, "views")
