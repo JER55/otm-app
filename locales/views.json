@@ -614,6 +614,41 @@
    "en": "% equity at risk",
    "es": "% de equity en riesgo"
   },
+  "CHART INDICATORS": {
+   "it": "INDICATORI GRAFICO",
+   "en": "CHART INDICATORS",
+   "es": "INDICADORES DEL GRÁFICO"
+  },
+  "EMA 20": {
+   "it": "EMA 20",
+   "en": "EMA 20",
+   "es": "EMA 20"
+  },
+  "EMA 50": {
+   "it": "EMA 50",
+   "en": "EMA 50",
+   "es": "EMA 50"
+  },
+  "VWAP · session/day": {
+   "it": "VWAP · sessione/giorno",
+   "en": "VWAP · session/day",
+   "es": "VWAP · sesión/día"
+  },
+  "Bollinger 20 · 2σ": {
+   "it": "Bande di Bollinger 20 · 2σ",
+   "en": "Bollinger 20 · 2σ",
+   "es": "Bandas de Bollinger 20 · 2σ"
+  },
+  "RSI 14 · pannello": {
+   "it": "RSI 14 · pannello",
+   "en": "RSI 14 · panel",
+   "es": "RSI 14 · panel"
+  },
+  "MACD 12/26/9 · pannello": {
+   "it": "MACD 12/26/9 · pannello",
+   "en": "MACD 12/26/9 · panel",
+   "es": "MACD 12/26/9 · panel"
+  },
   "LIQUIDITY DELTA PROFILER": {
    "it": "PROFILER DELTA DI LIQUIDITÀ",
    "en": "LIQUIDITY DELTA PROFILER",
