@@ -1263,12 +1263,13 @@ SHELL_HTML = r"""<!doctype html>
   header{position:relative;isolation:isolate;overflow:hidden;height:var(--hh);flex:0 0 var(--hh);
     display:flex;align-items:center;gap:10px;padding:0 12px;
     background:
-      radial-gradient(520px 110px at 0% 0%,rgba(61,212,200,.12),transparent 68%),
-      radial-gradient(480px 100px at 100% 0%,rgba(111,168,255,.08),transparent 70%),
-      linear-gradient(180deg,#101b2d 0%,#0a111e 100%);
-    border-bottom:1px solid rgba(111,168,255,.16);box-shadow:0 5px 22px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035)}
+      radial-gradient(560px 120px at 2% -30%,rgba(61,212,200,.17),transparent 66%),
+      radial-gradient(500px 110px at 96% -30%,rgba(111,168,255,.12),transparent 68%),
+      linear-gradient(180deg,#121f33 0%,#0a111e 100%);
+    border-bottom:1px solid rgba(111,168,255,.22);
+    box-shadow:0 7px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.055),inset 0 -1px 0 rgba(0,0,0,.28)}
   header::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
-    background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+    background-image:linear-gradient(rgba(255,255,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.032) 1px,transparent 1px);
     background-size:18px 18px;background-position:-1px -1px;
     -webkit-mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.25) 22%,transparent 45%,transparent 60%,rgba(0,0,0,.4) 100%);
             mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.25) 22%,transparent 45%,transparent 60%,rgba(0,0,0,.4) 100%)}
@@ -1278,37 +1279,44 @@ SHELL_HTML = r"""<!doctype html>
     box-shadow:0 0 9px 1px rgba(61,212,200,.36);transform:translateX(-110%);animation:sweep 9s cubic-bezier(.65,0,.35,1) infinite}
   @keyframes sweep{0%{transform:translateX(-110%)}60%,100%{transform:translateX(370%)}}
 
-  .brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;text-decoration:none;color:inherit;user-select:none;padding:0 5px 0 0}
-  .brand svg{width:40px;height:40px;display:block;overflow:visible;filter:drop-shadow(0 2px 8px rgba(0,0,0,.32));
-    transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-  .brand:hover svg{transform:translateY(-1px) scale(1.04)}
+  .brand{position:relative;display:flex;align-items:center;gap:10px;flex:0 0 auto;text-decoration:none;color:inherit;user-select:none;padding:0 7px 0 2px;
+    border-radius:12px;transition:background .2s ease,box-shadow .2s ease}
+  .brand:hover{background:linear-gradient(100deg,rgba(61,212,200,.075),rgba(111,168,255,.025));box-shadow:inset 0 0 0 1px rgba(143,220,239,.09)}
+  .brand svg{width:40px;height:40px;display:block;overflow:visible;
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,.52)) drop-shadow(0 0 7px rgba(61,212,200,.16));
+    transition:transform .32s cubic-bezier(.2,.8,.2,1),filter .32s ease}
+  .brand:hover svg{transform:translateY(-1px) scale(1.055);filter:drop-shadow(0 3px 7px rgba(0,0,0,.45)) drop-shadow(0 0 11px rgba(61,212,200,.3))}
   .brand svg .otm-orbit-a{transform-origin:82px 82px;animation:otm-spin 14s linear infinite}
   .brand svg .otm-orbit-b{transform-origin:82px 82px;animation:otm-spinr 22s linear infinite}
   @keyframes otm-spin{to{transform:rotate(360deg)}}
   @keyframes otm-spinr{to{transform:rotate(-360deg)}}
   .brand .otm-dot{transform-origin:24.5px 7.5px;animation:breakout 3.2s ease-in-out infinite}
   @keyframes breakout{0%,100%{transform:translate(0,0);opacity:1}45%{transform:translate(1.1px,-1.1px);opacity:1}55%{opacity:.55}}
-  .wm{display:flex;flex-direction:column;line-height:1}
-  .wm b{font:800 15px/1 'Inter',sans-serif;letter-spacing:.06em;color:#F5F7FB}
-  .wm b span{background:linear-gradient(100deg,#FFF44F,#FFD21C 68%,#F2A93B);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .wm small{margin-top:5px;font:600 7px/1 'Inter',sans-serif;letter-spacing:.31em;color:#8FA9C7;white-space:nowrap}
-  .sep{width:1px;height:27px;background:linear-gradient(180deg,transparent,var(--line-hi),transparent);flex:0 0 1px}
+  .wm{display:flex;flex-direction:column;line-height:1;gap:1px}
+  .wm b{font:800 15px/1 'Inter',sans-serif;letter-spacing:.075em;color:#F5F7FB;text-shadow:0 1px 8px rgba(111,168,255,.16)}
+  .wm b span{background:linear-gradient(100deg,#FFF978 0%,#FFD21C 52%,#F2A93B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 1px 5px rgba(242,169,59,.2))}
+  .wm small{margin-top:4px;font:600 7px/1 'Inter',sans-serif;letter-spacing:.34em;color:#91a9c6;white-space:nowrap}
+  .sep{width:1px;height:30px;background:linear-gradient(180deg,transparent,rgba(123,161,200,.3) 22%,rgba(123,161,200,.3) 78%,transparent);flex:0 0 1px}
 
-  nav{position:relative;display:flex;gap:2px;background:rgba(3,9,18,.44);border:1px solid var(--line-hi);border-radius:11px;padding:3px;
-    box-shadow:inset 0 1px 3px rgba(0,0,0,.32),0 1px 0 rgba(255,255,255,.025);flex:0 0 auto}
+  nav{position:relative;display:flex;gap:2px;background:linear-gradient(180deg,rgba(4,10,20,.74),rgba(3,9,18,.56));
+    border:1px solid rgba(157,183,220,.2);border-radius:12px;padding:3px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),inset 0 -2px 5px rgba(0,0,0,.22),0 3px 10px rgba(0,0,0,.16);
+    flex:0 0 auto;transition:border-color .2s ease,box-shadow .2s ease}
+  nav:hover{border-color:rgba(157,183,220,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.065),inset 0 -2px 5px rgba(0,0,0,.22),0 4px 14px rgba(0,0,0,.2)}
   nav button{all:unset;cursor:pointer;position:relative;z-index:1;padding:5px 12px;border-radius:8px;
-    font:700 10px/18px 'Inter',sans-serif;letter-spacing:.075em;color:#8494ad;transition:color .18s,background .18s;white-space:nowrap}
-  nav button:hover:not(.on){color:var(--light);background:rgba(255,255,255,.045)}
-  nav button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
-  nav button.on{color:#04111b;text-shadow:0 1px 0 rgba(255,255,255,.22)}
-  nav button kbd{font:700 8px/15px 'Inter',sans-serif;margin-left:8px;padding:0 4px;border-radius:4px;
-    color:rgba(225,244,255,.8);background:rgba(4,15,27,.17);opacity:.85}
+    font:700 10px/18px 'Inter',sans-serif;letter-spacing:.085em;color:#8e9db4;transition:color .18s,background .18s,text-shadow .18s;white-space:nowrap}
+  nav button:hover:not(.on){color:#f2f7ff;background:rgba(255,255,255,.055)}
+  nav button:focus-visible{outline:1px solid rgba(61,212,200,.92);outline-offset:2px;box-shadow:0 0 0 4px rgba(61,212,200,.1)}
+  nav button.on{color:#04111b;text-shadow:0 1px 0 rgba(255,255,255,.36),0 0 12px rgba(255,255,255,.24)}
+  nav button kbd{font:700 8px/15px 'Inter',sans-serif;margin-left:8px;padding:0 4px;border:1px solid rgba(225,244,255,.12);border-radius:4px;
+    color:rgba(225,244,255,.82);background:rgba(4,15,27,.2);opacity:.88}
   nav button .ld{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:6px;vertical-align:1px;background:currentColor;opacity:0;transition:opacity .2s}
   nav button.loading .ld{opacity:.7;animation:blink .8s infinite}
   @keyframes blink{50%{opacity:.15}}
   nav .ink{position:absolute;top:3px;bottom:3px;left:0;border-radius:8px;
-    background:linear-gradient(115deg,#42d9cc 0%,#58d6d4 48%,#60b9f4 100%);
-    box-shadow:0 2px 10px rgba(61,212,200,.2),inset 0 1px 0 rgba(255,255,255,.44);
+    background:linear-gradient(112deg,#42d9cc 0%,#55ddd2 37%,#59cfe3 69%,#69b9fa 100%);
+    box-shadow:0 3px 12px rgba(61,212,200,.25),0 0 20px rgba(111,168,255,.12),inset 0 1px 0 rgba(255,255,255,.58),inset 0 -1px 0 rgba(5,33,53,.12);
     transition:transform .24s cubic-bezier(.2,.8,.2,1),width .24s cubic-bezier(.2,.8,.2,1)}
   nav.noanim .ink{transition:none}
 
