@@ -88,8 +88,9 @@ def elenco() -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Codici di prova a tempo per Otmflow.")
     ap.add_argument("--nome", default="", help="a chi lo dai (solo nel registro locale)")
-    ap.add_argument("--durata", default="30g", help="30g, 7g, 1h, 90m … (di serie 30g)")
-    ap.add_argument("--url", default=os.environ.get("OTM_URL", ""), help="indirizzo dell'app per il messaggio")
+    ap.add_argument("--durata", default="365g", help="30g, 7g, 1h, 90m … (di serie 365g, 1 anno)")
+    ap.add_argument("--url", default=os.environ.get("OTM_URL", "https://otmflow.streamlit.app"),
+                    help="indirizzo dell'app per il messaggio")
     ap.add_argument("--nuova-chiave", action="store_true", help="genera LICENSE_SECRET")
     ap.add_argument("--verifica", metavar="CODICE")
     ap.add_argument("--elenco", action="store_true")
@@ -120,15 +121,17 @@ def main() -> None:
         sys.exit(str(ex))
     registra(dict(emesso=dt.datetime.now().isoformat(timespec="seconds"), id=ident, nome=a.nome,
                   durata=a.durata, scadenza_epoch=scadenza, scadenza_roma=ora_roma(scadenza)))
-    saluto = f"BELLA {a.nome}," if a.nome else "BELLA,"
     print(f"\nid {ident} · scade il {ora_roma(scadenza)} (ora italiana)\n")
     print("Messaggio da inviare:\n")
-    print(f"{saluto} ti mando in confidenza il tuo accesso di prova a Otmflow 😊")
+    print("Bella Friends, ola Amigos! 😊👋\n")
+    print("Ecco qui un accesso di prova a Otmflow:\n")
     if a.url:
-        print(f"  Indirizzo: {a.url}")
-    print(f"  Codice:    {codice}")
-    print(f"  Valido fino al {ora_roma(scadenza)} (ora italiana).")
-    print("Inseriscilo nel campo Password. È personale: tienilo per te 🤫\n")
+        print(f"Indirizzo: {a.url}")
+    print(f"Codice: {codice}")
+    if lic.durata_s(a.durata) == 365 * 86400:
+        print(f"Valido 1 anno, fino al {ora_roma(scadenza)}.")
+    else:
+        print(f"Valido fino al {ora_roma(scadenza)} (durata {a.durata}).")
 
 
 if __name__ == "__main__":
