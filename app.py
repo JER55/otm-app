@@ -803,19 +803,20 @@ html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stMainBlockContainer"] {{ padding-top:0.25rem !important; }}
 [data-testid="stVerticalBlock"] {{ gap:0 !important; }}
 [data-testid="stElementContainer"]:has(iframe[height="0"]) {{ display:none; }}
-.otm-brand {{ display:flex; flex-direction:column; align-items:center; gap:14px; }}
-.otm-brand svg {{ width:68px; height:68px; filter:drop-shadow(0 0 18px rgba(29,184,225,.28)) drop-shadow(0 0 20px rgba(242,190,46,.14)); }}
+.otm-brand {{ display:flex; flex-direction:column; align-items:center; gap:16px; }}
+.otm-brand svg {{ width:104px; height:104px; filter:drop-shadow(0 0 22px rgba(29,184,225,.32)) drop-shadow(0 0 24px rgba(242,190,46,.18)); }}
 .otm-brand svg .otm-orbit-a {{ transform-origin:82px 82px; animation:otm-spin 14s linear infinite; }}
 .otm-brand svg .otm-orbit-b {{ transform-origin:82px 82px; animation:otm-spinr 22s linear infinite; }}
 @keyframes otm-spin {{ to {{ transform:rotate(360deg); }} }}
 @keyframes otm-spinr {{ to {{ transform:rotate(-360deg); }} }}
 @media (prefers-reduced-motion:reduce) {{ .otm-brand svg .otm-orbit-a,.otm-brand svg .otm-orbit-b {{ animation:none; }} }}
-.otm-brand b {{ font-family:'Inter',sans-serif; font-weight:800; font-size:1.7rem;
+.otm-brand b {{ font-family:'Inter',sans-serif; font-weight:800; font-size:1.9rem;
                letter-spacing:.055em; color:#F5F7FB; }}
 .otm-brand b span {{ background:linear-gradient(100deg,#FFF44F,#FFD21C 68%,#F2A93B); -webkit-background-clip:text;
                     background-clip:text; color:transparent; }}
-.otm-brand small {{ font-family:'Inter',sans-serif; font-size:.68rem; letter-spacing:.42em;
+.otm-brand small {{ font-family:'Inter',sans-serif; font-size:.72rem; letter-spacing:.42em;
                    color:#8FA9C7; margin-top:-8px; }}
+@media (max-width:640px) {{ .otm-brand svg {{ width:88px; height:88px; }} }}
 iframe {{ border:1px solid {ELEVATED} !important; border-radius:10px; background:#050a12; display:block; }}
 </style>
 """,
