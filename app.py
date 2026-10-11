@@ -1231,7 +1231,7 @@ SHELL_HTML = r"""<!doctype html>
       <button role="tab" data-v="fakemove">FAKEMOVE E/L/C<i class="ld"></i><kbd>[</kbd></button>
       <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd>]</kbd></button>
     </nav>
-    <div class="tick" id="tick" data-i18n-title="BTCUSDT perpetuo · ultimo prezzo, variazione 24h e flusso aggressori degli ultimi 60 secondi (Binance Futures, dal tuo browser)">
+    <div class="tick" id="tick">
       <span class="sym"><i class="tdot" id="tlive"></i>BTC<em>PERP</em></span>
       <b class="px" id="tpx">—</b>
       <span class="chg" id="tch">—</span>
