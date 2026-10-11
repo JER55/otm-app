@@ -932,7 +932,9 @@ def _inject(html: str, nav_js: str, name: str = "") -> str:
     for vecchio, nuovo in _PATCHES.get(name, []):
         if vecchio in html:
             html = html.replace(vecchio, nuovo)
-        elif nuovo not in html:
+        elif (name != "footprint" or not re.search(
+                r"#kiyo-fp-head\{display:flex;align-items:center;gap:0;height:43px;min-height:43px;",
+                html)):
             st.warning(tr("Correzione non applicata alla vista {nome}: riga non trovata.", nome=name))
     if name == "footprint":
         html, pulsanti = re.subn(

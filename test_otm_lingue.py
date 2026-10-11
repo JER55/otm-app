@@ -180,13 +180,17 @@ class TestShell(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir, ignore_errors=True)
 
-    def _iframes(self, lang):
+    def _run_app(self, lang):
         at = AppTest.from_file(os.path.join(self.dir, "app.py"), default_timeout=30)
         at.secrets["APP_PASSWORD"] = "x"
         at.session_state["otm_auth"] = True
         at.query_params["lang"] = lang
         at.run()
         self.assertFalse(at.exception)
+        return at
+
+    def _iframes(self, lang):
+        at = self._run_app(lang)
         return [e.proto.srcdoc for e in at.main if getattr(e, "type", "") == "iframe"]
 
     def _html(self, lang):
@@ -224,12 +228,27 @@ class TestShell(unittest.TestCase):
         html = self._html("en")
         blob = re.search(r'<script type="application/json" id="v-footprint">(.*?)</script>', html, re.S).group(1)
         vista = json.loads(blob)
-        self.assertIn("height:43px;min-height:43px;flex:0 0 43px;box-sizing:border-box;padding:6px 14px;", vista)
+        self.assertIn("height:43px;min-height:43px;", vista)
+        self.assertIn("flex:0 0 43px;box-sizing:border-box;padding:6px 14px;", vista)
         self.assertNotIn('id="kiyo-fp-refresh"', vista)
         self.assertNotIn('id="kiyo-fp-close"', vista)
         self.assertNotIn("querySelector('#kiyo-fp-refresh')", vista)
         self.assertNotIn("querySelector('#kiyo-fp-close')", vista)
         self.assertIn('id="kiyo-fp-trade"', vista)
+
+    def test_non_mostra_avviso_per_sorgente_footprint_gia_aggiornato(self):
+        path = os.path.join(self.dir, "views", "footprint.html")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(
+                '<!doctype html><html><head><script>'
+                "var css = '#kiyo-fp-head{display:flex;align-items:center;gap:0;height:43px;min-height:43px;';"
+                "'flex:0 0 43px;box-sizing:border-box;padding:6px 14px;';"
+                "head.innerHTML = '<button id=\"kiyo-fp-trade\">TRADE</button>';"
+                "</script></head><body>FP</body></html>"
+            )
+        at = self._run_app("en")
+        self.assertNotIn("Fix not applied to the footprint view: line not found.",
+                         [e.value for e in at.warning])
 
     def test_lingua_non_valida_ricade_sull_italiano(self):
         html = self._html("../../etc")
