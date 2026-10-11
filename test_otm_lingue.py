@@ -101,6 +101,11 @@ class TestIdentitaScheda(unittest.TestCase):
         self.assertIn("page_title=APP_TITLE", src)
         self.assertIn("page_icon=_otm_icon()", src)
 
+    def test_login_senza_animazioni_iniziali_o_font_flash(self):
+        src = _sorgente()
+        self.assertIn("Inter:wght@400;500;600;700;800&display=optional", src)
+        self.assertIn(".otm-brand svg * {{ animation:none !important; }}", src)
+
 
 @unittest.skipIf(AppTest is None, "Streamlit non installato")
 class TestAccesso(unittest.TestCase):

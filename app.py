@@ -956,7 +956,7 @@ st.set_page_config(
 st.markdown(
     f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional');
 html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stHeader"], [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] {{ display:none; }}
 #MainMenu, footer, [data-testid="stToolbar"] {{ visibility:hidden; }}
@@ -966,6 +966,7 @@ html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stElementContainer"]:has(iframe[height="0"]) {{ display:none; }}
 .otm-brand {{ display:flex; flex-direction:column; align-items:center; gap:16px; }}
 .otm-brand svg {{ width:208px; height:208px; filter:drop-shadow(0 0 22px rgba(29,184,225,.32)) drop-shadow(0 0 24px rgba(242,190,46,.18)); }}
+.otm-brand svg * {{ animation:none !important; }}
 .otm-brand svg .otm-orbit-a {{ transform-origin:82px 82px; animation:otm-spin 14s linear infinite; }}
 .otm-brand svg .otm-orbit-b {{ transform-origin:82px 82px; animation:otm-spinr 22s linear infinite; }}
 @keyframes otm-spin {{ to {{ transform:rotate(360deg); }} }}
