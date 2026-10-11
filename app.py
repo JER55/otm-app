@@ -768,7 +768,8 @@ SHELL_HTML = r"""<!doctype html>
       try { ws.close(); } catch (e) {}
       setTimeout(feed, Math.min(30000, 1000 * Math.pow(2, Math.min(TK.fails, 5))));
     }
-    try { ws = new WebSocket('wss://fstream.binance.com/stream?streams=btcusdt@aggTrade/btcusdt@ticker'); }
+    // USDⓈ-M: /stream legacy dismesso (Binance 2026-03-06) -> route /market (aggTrade, ticker)
+    try { ws = new WebSocket('wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade/btcusdt@ticker'); }
     catch (e) { TK.fails++; setTimeout(feed, 15000); return; }
     TK.ws = ws;
     ws.onmessage = function (ev) {
