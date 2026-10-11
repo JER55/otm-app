@@ -120,15 +120,15 @@ def main() -> None:
         sys.exit(str(ex))
     registra(dict(emesso=dt.datetime.now().isoformat(timespec="seconds"), id=ident, nome=a.nome,
                   durata=a.durata, scadenza_epoch=scadenza, scadenza_roma=ora_roma(scadenza)))
-    saluto = f"Ciao {a.nome}," if a.nome else "Ciao,"
+    saluto = f"BELLA {a.nome}," if a.nome else "BELLA,"
     print(f"\nid {ident} · scade il {ora_roma(scadenza)} (ora italiana)\n")
     print("Messaggio da inviare:\n")
-    print(f"{saluto} ecco il tuo accesso di prova a Otmflow.")
+    print(f"{saluto} ti mando in confidenza il tuo accesso di prova a Otmflow 😊")
     if a.url:
         print(f"  Indirizzo: {a.url}")
     print(f"  Codice:    {codice}")
     print(f"  Valido fino al {ora_roma(scadenza)} (ora italiana).")
-    print("Inseriscilo nel campo Password. È personale: non condividerlo.\n")
+    print("Inseriscilo nel campo Password. È personale: tienilo per te 🤫\n")
 
 
 if __name__ == "__main__":
