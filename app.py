@@ -1139,9 +1139,14 @@ SHELL_HTML = r"""<!doctype html>
   header>*:not(.sp){flex-shrink:0}
 
   /* ── sessione USA con avanzamento ── */
+  .market-time{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+  .clk{display:flex;flex-direction:column;align-items:flex-end;line-height:1;cursor:default;padding:0 3px}
+  .clk small{font:700 7px 'Inter',sans-serif;letter-spacing:.22em;color:#71829d}
+  .clk b{margin-top:4px;font:700 12px 'Inter',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.025em;color:var(--light)}
   .sess{position:relative;display:flex;align-items:center;gap:7px;height:34px;padding:0 10px;border-radius:10px;
     border:1px solid var(--line-hi);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
     font:600 9px 'Inter',sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;cursor:default}
+  .sess-tag{font:700 8px 'Inter',sans-serif;letter-spacing:.11em;color:#8fa2bf;padding-right:6px;border-right:1px solid var(--line-hi)}
   .sess b{font:800 9px 'Inter',sans-serif;letter-spacing:.065em;color:var(--light)}
   .sess .nx{font:600 9px 'Inter',sans-serif;color:#91a0b7}
   .sess .tr{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.04)}
@@ -1153,10 +1158,6 @@ SHELL_HTML = r"""<!doctype html>
   .dot.open{background:var(--teal);animation:pulse 1.8s infinite}
   .dot.pre{background:var(--amber)}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,212,200,.55)}70%{box-shadow:0 0 0 6px rgba(61,212,200,0)}100%{box-shadow:0 0 0 0 rgba(61,212,200,0)}}
-
-  .clk{display:flex;flex-direction:column;align-items:flex-end;line-height:1;cursor:default;padding:0 3px}
-  .clk small{font:700 7px 'Inter',sans-serif;letter-spacing:.22em;color:#71829d}
-  .clk b{margin-top:4px;font:700 12px 'Inter',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.025em;color:var(--light)}
 
   .pill{display:flex;align-items:center;gap:7px;font:700 8px 'Inter',sans-serif;letter-spacing:.09em;padding:6px 9px;
     border-radius:7px;border:1px solid;white-space:nowrap;cursor:help}
@@ -1191,10 +1192,9 @@ SHELL_HTML = r"""<!doctype html>
     background-size:200% 100%;animation:sh 1.1s linear infinite}
   @keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
 
-  @media (max-width:1580px){.hide-xl{display:none}}
-  @media (max-width:1340px){.hide-l{display:none}}
-  @media (max-width:1120px){.hide-t{display:none}}
-  @media (max-width:980px){.hide-m{display:none}}
+  @media (max-width:1580px){.flow{display:none}}
+  @media (max-width:1340px){.tick{display:none}.wm small{display:none}header{gap:8px}}
+  @media (max-width:980px){.market-time{display:none}}
   @media (max-width:760px){header{gap:7px;padding:0 8px}.wm,.sep{display:none}nav button{padding:4px 8px}nav button kbd{display:none}.tick{gap:7px;padding:0 8px}.flow{gap:5px;padding-left:8px}.bar{width:48px}}
   @media (max-width:520px){.tick{height:32px;gap:6px}.sym em{display:none}.px{min-width:66px;font-size:12px}.chg{font-size:9px;padding:3px 5px}nav button{font-size:9px;padding:3px 6px}.ib{width:29px;height:29px}}
   @media (prefers-reduced-motion:reduce){header::after,.brand .otm-dot,.tdot.on,.dot.open{animation:none}}
@@ -1208,15 +1208,19 @@ SHELL_HTML = r"""<!doctype html>
       <button role="tab" data-v="fakemove">FAKEMOVE E/L/C<i class="ld"></i><kbd>[</kbd></button>
       <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd>]</kbd></button>
     </nav>
-    <div class="tick hide-t" id="tick" data-i18n-title="BTCUSDT perpetuo · ultimo prezzo, variazione 24h e flusso aggressori degli ultimi 60 secondi (Binance Futures, dal tuo browser)">
+    <div class="tick" id="tick" data-i18n-title="BTCUSDT perpetuo · ultimo prezzo, variazione 24h e flusso aggressori degli ultimi 60 secondi (Binance Futures, dal tuo browser)">
       <span class="sym"><i class="tdot" id="tlive"></i>BTC<em>PERP</em></span>
       <b class="px" id="tpx">—</b>
       <span class="chg" id="tch">—</span>
-      <span class="flow hide-l" id="tflow"><span class="fl" data-i18n="FLUSSO 60s"></span><span class="bar idle" id="tbar"><i id="tbuy"></i></span><span class="fd" id="tfd">—</span></span>
+      <span class="flow" id="tflow"><span class="fl" data-i18n="FLUSSO 60s"></span><span class="bar idle" id="tbar"><i id="tbuy"></i></span><span class="fd" id="tfd">—</span></span>
     </div>
     <div class="sp"></div>
-    <div class="sess hide-xl" id="sess" data-i18n-title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)"><span class="dot" id="sdot"></span><span>US <b id="sst"></b></span><span class="nx" id="snext"></span><span class="tr"><i id="sbar"></i></span></div>
-    <div class="clk hide-m" data-i18n-title="Ora di Roma"><small data-i18n="ROMA"></small><b id="clock">--:--:--</b></div>
+    <div class="market-time">
+      <div class="clk" data-i18n-title="Ora di Roma"><small data-i18n="ROMA"></small><b id="clock">--:--:--</b></div>
+      <div class="sess" id="sess" role="status" aria-live="off" data-i18n-title="Sessione cash USA 09:30–16:00 New York (le VA della Footprint usano questa sessione)">
+        <span class="sess-tag">USA</span><span class="dot" id="sdot"></span><b id="sst"></b><span class="nx" id="snext"></span><span class="tr"><i id="sbar"></i></span>
+      </div>
+    </div>
     <span class="pill" id="mode"></span>
     <div class="lang" id="lang" role="radiogroup" data-i18n-title="Lingua">
       <button role="radio" data-l="it" title="Italiano">IT</button>
@@ -1499,7 +1503,7 @@ SHELL_HTML = r"""<!doctype html>
     var box = document.getElementById('sess'), bar = document.getElementById('sbar');
     var weekday = wd >= 1 && wd <= 5;
     if (weekday && mins >= OPEN && mins < CLOSE) {
-      dot.className = 'dot open'; box.className = 'sess hide-xl open';
+      dot.className = 'dot open'; box.className = 'sess open';
       st.textContent = t("APERTA"); nx.textContent = t("chiude tra {d}", { d: dur(CLOSE - mins) });
       bar.style.width = ((mins - OPEN) / (CLOSE - OPEN) * 100).toFixed(2) + '%';
       return;
@@ -1509,7 +1513,7 @@ SHELL_HTML = r"""<!doctype html>
     else { var days = wd === 5 ? 3 : (wd === 6 ? 2 : 1); until = days * 1440 - mins + OPEN; }
     var pre = weekday && mins >= PRE && mins < OPEN;
     dot.className = 'dot' + (pre ? ' pre' : '');
-    box.className = 'sess hide-xl' + (pre ? ' pre' : '');
+    box.className = 'sess' + (pre ? ' pre' : '');
     bar.style.width = pre ? ((mins - PRE) / (OPEN - PRE) * 100).toFixed(2) + '%' : '0%';
     st.textContent = pre ? t("PRE-MARKET") : t("CHIUSA");
     nx.textContent = t("apre tra {d}", { d: dur(until) });
