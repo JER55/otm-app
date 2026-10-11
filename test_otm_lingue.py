@@ -106,6 +106,12 @@ class TestIdentitaScheda(unittest.TestCase):
         self.assertIn("Inter:wght@400;500;600;700;800&display=optional", src)
         self.assertIn(".otm-brand svg * {{ animation:none !important; }}", src)
 
+    def test_shell_adattabile_a_viewport_mobile(self):
+        src = _sorgente()
+        self.assertIn('name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"', src)
+        self.assertIn("height:100dvh", src)
+        self.assertIn("topWin.visualViewport", src)
+
 
 @unittest.skipIf(AppTest is None, "Streamlit non installato")
 class TestAccesso(unittest.TestCase):

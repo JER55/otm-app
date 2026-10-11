@@ -1263,6 +1263,7 @@ def load_shell(local: bool, lang: str) -> str:
 # ── Shell lato browser ──────────────────────────────────────────────────────
 SHELL_HTML = r"""<!doctype html>
 <html lang="%%LANG%%"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>var OTM_I18N = %%I18N%%;</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1271,8 +1272,8 @@ SHELL_HTML = r"""<!doctype html>
     --light:#E8EEF9;--amber:#F2A93B;--red:#FF5C5C;--green:#2EE6A6;--hh:50px;
     --glass:rgba(255,255,255,.035);--line:rgba(255,255,255,.07);--line-hi:rgba(157,183,220,.16)}
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:#050a12;overflow:hidden;color:var(--light);font-family:'Inter',sans-serif}
-  #shell{display:flex;flex-direction:column;height:100%}
+  html,body{height:100%;height:100dvh;margin:0;background:#050a12;overflow:hidden;color:var(--light);font-family:'Inter',sans-serif}
+  #shell{display:flex;flex-direction:column;height:100%;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 
   /* ── barra ─────────────────────────────────────────────────────────── */
   header{position:relative;isolation:isolate;overflow:hidden;height:var(--hh);flex:0 0 var(--hh);
@@ -1624,12 +1625,25 @@ SHELL_HTML = r"""<!doctype html>
   function fit() {
     var fe = window.frameElement; if (!fe || pseudo || document.fullscreenElement) return;
     try {
-      var r = fe.getBoundingClientRect(), H = window.top.innerHeight;
-      var h = Math.max(480, Math.floor(H - r.top - 4));
+      var topWin = window.top, H = topWin.innerHeight;
+      try {
+        var vv = topWin.visualViewport;
+        if (vv) H = vv.height + vv.offsetTop;
+      } catch (e) {}
+      var r = fe.getBoundingClientRect();
+      var h = Math.max(240, Math.floor(H - r.top - 4));
       if (Math.abs((parseFloat(fe.style.height) || 0) - h) > 1) fe.style.height = h + 'px';
     } catch (e) {}
   }
-  try { window.top.addEventListener('resize', fit); } catch (e) {}
+  try {
+    window.top.addEventListener('resize', fit);
+    if (window.top.visualViewport) {
+      window.top.visualViewport.addEventListener('resize', fit);
+      window.top.visualViewport.addEventListener('scroll', fit);
+    }
+  } catch (e) {}
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', fit);
   [0, 150, 600, 1500, 3000].forEach(function (ms) { setTimeout(fit, ms); });
   window.addEventListener('resize', moveInk);
 
