@@ -235,6 +235,8 @@ class TestShell(unittest.TestCase):
         self.assertNotIn("querySelector('#kiyo-fp-refresh')", vista)
         self.assertNotIn("querySelector('#kiyo-fp-close')", vista)
         self.assertIn('id="kiyo-fp-trade"', vista)
+        self.assertIn("if (!isLocal)", vista)
+        self.assertIn("#kiyo-fp-trade,#kiyo-fp-order{display:none!important}", vista)
 
     def test_non_mostra_avviso_per_sorgente_footprint_gia_aggiornato(self):
         path = os.path.join(self.dir, "views", "footprint.html")

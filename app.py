@@ -1041,6 +1041,9 @@ _SHIM = """<script>
   var isLocal = h === 'localhost' || h === '127.0.0.1' || h.indexOf('192.168.') === 0 || /\\.local$/.test(h);
   window.__OTM_LOCAL = isLocal;
   if (!isLocal) {
+    var _tradeStyle = document.createElement('style');
+    _tradeStyle.textContent = '#kiyo-fp-trade,#kiyo-fp-order{display:none!important}';
+    (document.head || document.documentElement).appendChild(_tradeStyle);
     // Cloud: niente esecuzione. Blocca proxy locale e Netlify prima che partano richieste.
     var _f = window.fetch.bind(window);
     window.fetch = function (u, o) {
