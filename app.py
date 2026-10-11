@@ -762,7 +762,8 @@ LOGO_FULL = (
 )
 OTM_MARK_SVG = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 134 128" width="32" height="32" aria-hidden="true">'
-    '<image href="' + LOGO_MARK + '" x="0" y="0" width="134" height="128" preserveAspectRatio="xMidYMid meet"/>'
+    '<defs><clipPath id="otm-mark-clip"><rect x="0" y="0" width="134" height="128" rx="18"/></clipPath></defs>'
+    '<image href="' + LOGO_MARK + '" x="0" y="0" width="134" height="128" clip-path="url(#otm-mark-clip)" preserveAspectRatio="xMidYMid meet"/>'
     '</svg>'
 )
 FAVICON_URL = "data:image/svg+xml," + urllib.parse.quote(OTM_MARK_SVG)
