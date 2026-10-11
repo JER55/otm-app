@@ -782,7 +782,7 @@ st.set_page_config(
 st.markdown(
     f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 html, body, [data-testid="stAppViewContainer"] {{ background:{INK}; }}
 [data-testid="stHeader"], [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] {{ display:none; }}
 #MainMenu, footer, [data-testid="stToolbar"] {{ visibility:hidden; }}
@@ -1047,13 +1047,13 @@ SHELL_HTML = r"""<!doctype html>
 <html lang="%%LANG%%"><head><meta charset="utf-8">
 <script>var OTM_I18N = %%I18N%%;</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{--ink:#0B1220;--surf:#111C2E;--elev:#16233A;--teal:#3DD4C8;--sky:#6FA8FF;--muted:#8394B0;--dim:#56657F;
     --light:#E8EEF9;--amber:#F2A93B;--red:#FF5C5C;--green:#2EE6A6;--hh:44px;
     --glass:rgba(255,255,255,.035);--line:rgba(255,255,255,.07)}
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:#050a12;overflow:hidden;color:var(--light);font-family:Inter,system-ui,sans-serif}
+  html,body{height:100%;margin:0;background:#050a12;overflow:hidden;color:var(--light);font-family:'Inter',sans-serif}
   #shell{display:flex;flex-direction:column;height:100%}
 
   /* ── barra ─────────────────────────────────────────────────────────── */
@@ -1093,7 +1093,7 @@ SHELL_HTML = r"""<!doctype html>
   nav button:hover{color:var(--light)}
   nav button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
   nav button.on{color:#04110f}
-  nav button kbd{font:700 9px 'JetBrains Mono',monospace;margin-left:7px;padding:0 4px;border-radius:3px;
+  nav button kbd{font:700 9px 'Inter',sans-serif;margin-left:7px;padding:0 4px;border-radius:3px;
     background:rgba(255,255,255,.08);opacity:.55}
   nav button .ld{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:6px;vertical-align:1px;background:currentColor;opacity:0;transition:opacity .2s}
   nav button.loading .ld{opacity:.7;animation:blink .8s infinite}
@@ -1109,15 +1109,15 @@ SHELL_HTML = r"""<!doctype html>
     background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border:1px solid var(--line);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04);white-space:nowrap;cursor:default}
   .sym{display:flex;align-items:center;gap:6px;font:700 10.5px 'Inter',sans-serif;letter-spacing:.08em;color:var(--light)}
-  .sym em{font:600 8px 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.06em;color:var(--dim);
+  .sym em{font:600 8px 'Inter',sans-serif;font-style:normal;letter-spacing:.06em;color:var(--dim);
     padding:1px 4px;border:1px solid var(--line);border-radius:3px}
   .tdot{width:6px;height:6px;border-radius:50%;background:var(--dim)}
   .tdot.on{background:var(--green);animation:pulse 1.8s infinite}
-  .px{font:700 13px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--light);
+  .px{font:700 13px 'Inter',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--light);
     min-width:78px;text-align:right;transition:color .5s ease,text-shadow .5s ease}
   .px.up{color:var(--green);text-shadow:0 0 12px rgba(46,230,166,.45);transition:none}
   .px.dn{color:var(--red);text-shadow:0 0 12px rgba(255,92,92,.45);transition:none}
-  .chg{font:600 10.5px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--muted);
+  .chg{font:600 10.5px 'Inter',sans-serif;font-variant-numeric:tabular-nums;color:var(--muted);
     padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.04)}
   .chg.up{color:var(--green);background:rgba(46,230,166,.09)}
   .chg.dn{color:var(--red);background:rgba(255,92,92,.09)}
@@ -1129,7 +1129,7 @@ SHELL_HTML = r"""<!doctype html>
     transition:width .45s cubic-bezier(.2,.8,.2,1);box-shadow:2px 0 6px rgba(46,230,166,.6)}
   .bar::after{content:'';position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:rgba(255,255,255,.55)}
   .bar.idle{background:rgba(255,255,255,.08)} .bar.idle i{opacity:0}
-  .fd{font:700 10.5px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;min-width:52px;color:var(--muted)}
+  .fd{font:700 10.5px 'Inter',sans-serif;font-variant-numeric:tabular-nums;min-width:52px;color:var(--muted)}
   .fd.up{color:var(--green)} .fd.dn{color:var(--red)}
 
   .sp{flex:1;min-width:0}
@@ -1137,9 +1137,9 @@ SHELL_HTML = r"""<!doctype html>
 
   /* ── sessione USA con avanzamento ── */
   .sess{position:relative;display:flex;align-items:center;gap:7px;height:30px;padding:0 10px;border-radius:9px;
-    border:1px solid var(--line);background:var(--glass);font:600 10.5px Inter,sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;cursor:default}
+    border:1px solid var(--line);background:var(--glass);font:600 10.5px 'Inter',sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;cursor:default}
   .sess b{font:700 10.5px 'Inter',sans-serif;letter-spacing:.08em;color:var(--light)}
-  .sess .nx{font:600 10px 'JetBrains Mono',monospace;color:var(--muted)}
+  .sess .nx{font:600 10px 'Inter',sans-serif;color:var(--muted)}
   .sess .tr{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.04)}
   .sess .tr i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--sky));transition:width 1s linear}
   .sess.pre .tr i{background:linear-gradient(90deg,#c9801f,var(--amber))}
@@ -1150,9 +1150,9 @@ SHELL_HTML = r"""<!doctype html>
 
   .clk{display:flex;flex-direction:column;align-items:flex-end;line-height:1;cursor:default}
   .clk small{font:700 7.5px 'Inter',sans-serif;letter-spacing:.3em;color:var(--dim)}
-  .clk b{margin-top:3px;font:700 13px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--light)}
+  .clk b{margin-top:3px;font:700 13px 'Inter',sans-serif;font-variant-numeric:tabular-nums;color:var(--light)}
 
-  .pill{display:flex;align-items:center;gap:6px;font:700 9px 'JetBrains Mono',monospace;letter-spacing:.06em;padding:4px 9px;
+  .pill{display:flex;align-items:center;gap:6px;font:700 9px 'Inter',sans-serif;letter-spacing:.06em;padding:4px 9px;
     border-radius:999px;border:1px solid;white-space:nowrap;cursor:default}
   .pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
   .pill.live{color:var(--red);border-color:rgba(255,92,92,.4);background:rgba(255,92,92,.08)}
@@ -1161,7 +1161,7 @@ SHELL_HTML = r"""<!doctype html>
 
   .lang{display:flex;background:var(--glass);border:1px solid var(--line);border-radius:8px;padding:2px}
   .lang button{all:unset;cursor:pointer;padding:2px 7px;border-radius:6px;color:var(--muted);
-    font:700 9.5px/16px 'JetBrains Mono',monospace;letter-spacing:.04em;transition:color .15s,background .15s}
+    font:700 9.5px/16px 'Inter',sans-serif;letter-spacing:.04em;transition:color .15s,background .15s}
   .lang button:hover:not(.on){color:var(--light)}
   .lang button:focus-visible{outline:1px solid var(--teal);outline-offset:1px}
   .lang button.on{color:#04110f;background:linear-gradient(135deg,var(--teal),#59b4f2)}
