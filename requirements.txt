@@ -1,2 +1,2 @@
 streamlit==1.65.0
-streamlit-analytics2
+streamlit-analytics2>=0.11,<0.12

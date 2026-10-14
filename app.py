@@ -1805,11 +1805,14 @@ SHELL_HTML = r"""<!doctype html>
 # In locale senza secret l'accesso e' libero; in cloud senza secret l'app si blocca.
 
 
-_tab_identity()
-local = _is_local()
-scadenza = accesso_otm.richiedi_accesso(local, OTM_MARK_SVG)
+import statistiche_uso              # statistiche d'uso: ?analytics=on (vedi statistiche_uso.py)
 
-# Un solo componente: la shell gestisce tab, viste e schermo intero lato browser,
-# quindi nessun rerun di Streamlit quando cambi vista o ridimensioni.
-components.html(accesso_otm.con_scadenza(load_shell(local, tz.lingua_corrente()), scadenza),
-                height=860, scrolling=False)
+with statistiche_uso.traccia():
+    _tab_identity()
+    local = _is_local()
+    scadenza = accesso_otm.richiedi_accesso(local, OTM_MARK_SVG)
+
+    # Un solo componente: la shell gestisce tab, viste e schermo intero lato browser,
+    # quindi nessun rerun di Streamlit quando cambi vista o ridimensioni.
+    components.html(accesso_otm.con_scadenza(load_shell(local, tz.lingua_corrente()), scadenza),
+                    height=860, scrolling=False)
