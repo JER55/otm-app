@@ -74,6 +74,7 @@ def _gh_request(method, url, token, **kw):
 FILE_CONTATORI = "analytics.json"
 FILE_EVENTI = "analytics.events.jsonl"
 SYNC_MIN = 15                          # minuti tra un salvataggio e l'altro sul repo
+PRIMA_SYNC_S = 120                     # primo salvataggio 2 minuti dopo l'avvio
 MAX_EVENTI_BYTE = 4 * 1024 * 1024      # oltre: si tengono solo gli eventi più recenti
 RUN = "run"                            # un evento per ogni rerun: se ne tengono solo gli estremi
 
@@ -91,10 +92,13 @@ def _password():
 
 
 def _cartella():
-    """Cartella locale, separata per ogni app (ogni app ha il suo path nel repo di stato)."""
-    cfg = _github_cfg()
-    sotto = (cfg["path"] if cfg else "locale").replace("/", "_") or "root"
-    d = os.path.join("/tmp", "otm_analytics", sotto)
+    """Cartella locale, fissata al primo uso: resta la stessa anche se token/repo
+    arrivano dopo, così i dati già raccolti non restano indietro."""
+    d = _stato.get("cartella")
+    if d is None:
+        cfg = _github_cfg()
+        sotto = (cfg["path"] if cfg else "locale").replace("/", "_") or "root"
+        d = _stato["cartella"] = os.path.join("/tmp", "otm_analytics", sotto)
     os.makedirs(d, exist_ok=True)
     return d
 
@@ -183,19 +187,34 @@ def _sincronizza(cartella):
 
 
 def _ciclo(cartella):
+    attesa = PRIMA_SYNC_S                      # primo salvataggio presto, poi ogni SYNC_MIN
     while True:
-        time.sleep(SYNC_MIN * 60)
+        time.sleep(attesa)
+        attesa = SYNC_MIN * 60
         try:
             _sincronizza(cartella)
         except Exception as ex:
             log.warning("statistiche: sincronizzazione fallita: %s", ex)
 
 
+def _avvia_sync(cartella):
+    if not _stato.get("sync"):
+        threading.Thread(target=_ciclo, args=(cartella,), daemon=True,
+                         name="otm-statistiche").start()
+        _stato["sync"] = True
+
+
 def _prepara():
-    """Una volta per processo: scarica lo storico e avvia il salvataggio periodico."""
+    """Una volta per processo: scarica lo storico e avvia il salvataggio periodico.
+
+    Se token/repo arrivano DOPO l'avvio (Streamlit applica i Secrets nuovi senza
+    riavviare l'app), il salvataggio parte al primo run successivo; lo storico sul
+    repo viene letto al prossimo riavvio."""
     cartella = _cartella()
     with _lock:
         if _stato["pronto"]:
+            if not _stato.get("sync") and _github_cfg() is not None:
+                _avvia_sync(cartella)
             return cartella
         cfg = _github_cfg()
         if cfg is not None:
@@ -206,8 +225,7 @@ def _prepara():
                     log.warning("statistiche: download %s fallito: %s", nome, ex)
             for nome in (FILE_CONTATORI, FILE_EVENTI):
                 _stato["firme"][nome] = _firma(os.path.join(cartella, nome))
-            threading.Thread(target=_ciclo, args=(cartella,), daemon=True,
-                             name="otm-statistiche").start()
+            _avvia_sync(cartella)
         _stato["pronto"] = True
     return cartella
 
