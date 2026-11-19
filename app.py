@@ -1,7 +1,7 @@
 """
 OUTTHINK THE MARKET — Otmflow, shell Streamlit
 -----------------------------------------------
-Incorpora le due app JS (FakeMove E/L/C e Footprint). Rendering e websocket
+Incorpora le due app JS (Chart, ex FakeMove E/L/C, e Footprint). Rendering e websocket
 restano nel browser: i dati arrivano dal tuo IP (Italia), non dal server
 Streamlit (USA, bloccato da Binance/Bybit).
 
@@ -1317,14 +1317,18 @@ SHELL_HTML = r"""<!doctype html>
     box-shadow:inset 0 1px 0 rgba(255,255,255,.055),inset 0 -2px 5px rgba(0,0,0,.22),0 3px 10px rgba(0,0,0,.16);
     flex:0 0 auto;transition:border-color .2s ease,box-shadow .2s ease}
   nav:hover{border-color:rgba(157,183,220,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.065),inset 0 -2px 5px rgba(0,0,0,.22),0 4px 14px rgba(0,0,0,.2)}
-  nav button{all:unset;cursor:pointer;position:relative;z-index:1;padding:5px 12px;border-radius:8px;
+  nav button{all:unset;cursor:pointer;position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:8px;
     font:700 10px/18px 'Inter',sans-serif;letter-spacing:.085em;color:#8e9db4;transition:color .18s,background .18s,text-shadow .18s;white-space:nowrap}
   nav button:hover:not(.on){color:#f2f7ff;background:rgba(255,255,255,.055)}
   nav button:focus-visible{outline:1px solid rgba(61,212,200,.92);outline-offset:2px;box-shadow:0 0 0 4px rgba(61,212,200,.1)}
   nav button.on{color:#04111b;text-shadow:0 1px 0 rgba(255,255,255,.36),0 0 12px rgba(255,255,255,.24)}
-  nav button kbd{font:700 8px/15px 'Inter',sans-serif;margin-left:8px;padding:0 4px;border:1px solid rgba(225,244,255,.12);border-radius:4px;
-    color:rgba(225,244,255,.82);background:rgba(4,15,27,.2);opacity:.88}
-  nav button .ld{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:6px;vertical-align:1px;background:currentColor;opacity:0;transition:opacity .2s}
+  nav button kbd{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:16px;height:16px;
+    border:1px solid rgba(225,244,255,.14);border-radius:4px;color:rgba(225,244,255,.82);background:rgba(4,15,27,.2);opacity:.88;
+    font-size:0;line-height:0;letter-spacing:0}
+  nav button kbd::before{content:'';box-sizing:border-box;width:4px;height:8px;border:1.5px solid currentColor}
+  nav button kbd.kl::before{border-right:0}
+  nav button kbd.kr::before{border-left:0}
+  nav button .ld{position:absolute;left:4px;top:50%;width:4px;height:4px;margin-top:-2px;border-radius:50%;background:currentColor;opacity:0;transition:opacity .2s}
   nav button.loading .ld{opacity:.7;animation:blink .8s infinite}
   @keyframes blink{50%{opacity:.15}}
   nav .ink{position:absolute;top:3px;bottom:3px;left:0;border-radius:8px;
@@ -1433,8 +1437,8 @@ SHELL_HTML = r"""<!doctype html>
     <span class="sep"></span>
     <nav id="tabs" class="noanim" role="tablist">
       <i class="ink"></i>
-      <button role="tab" data-v="fakemove">FAKEMOVE E/L/C<i class="ld"></i><kbd>[</kbd></button>
-      <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd>]</kbd></button>
+      <button role="tab" data-v="fakemove">CHART<i class="ld"></i><kbd class="kl" aria-hidden="true">[</kbd></button>
+      <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd class="kr" aria-hidden="true">]</kbd></button>
     </nav>
     <div class="tick" id="tick">
       <span class="sym"><i class="tdot" id="tlive"></i>BTC<em>PERP</em></span>
