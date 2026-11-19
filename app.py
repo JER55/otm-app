@@ -1078,11 +1078,7 @@ def _i18n_head() -> str:
 
 # Correzioni sul sorgente delle viste (se la riga non c'e' piu', la vista resta com'e')
 _PATCHES = {
-    # il messaggio si cancellava confrontando il testo del DOM, che la traduzione puo' aver cambiato
-    "fakemove": [(
-        "function _flash(t) { if (_msg) { _msg.textContent = t; setTimeout(() => { if (_msg.textContent === t) _msg.textContent = ''; }, 2200); } }",
-        "function _flash(t) { if (_msg) { _msg.textContent = t; const _id = (_flash._n = (_flash._n || 0) + 1); setTimeout(() => { if (_flash._n === _id) _msg.textContent = ''; }, 2200); } }",
-    )],
+    # fakemove: _flash corretto nel sorgente (il grafico ora annulla il timer a ogni messaggio)
     "footprint": [(
         "#kiyo-fp-head{display:flex;align-items:center;gap:0;padding:11px 16px;",
         "#kiyo-fp-head{display:flex;align-items:center;gap:0;height:43px;min-height:43px;"
