@@ -1322,12 +1322,10 @@ SHELL_HTML = r"""<!doctype html>
   nav button:hover:not(.on){color:#f2f7ff;background:rgba(255,255,255,.055)}
   nav button:focus-visible{outline:1px solid rgba(61,212,200,.92);outline-offset:2px;box-shadow:0 0 0 4px rgba(61,212,200,.1)}
   nav button.on{color:#04111b;text-shadow:0 1px 0 rgba(255,255,255,.36),0 0 12px rgba(255,255,255,.24)}
-  nav button kbd{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:16px;height:16px;
-    border:1px solid rgba(225,244,255,.14);border-radius:4px;color:rgba(225,244,255,.82);background:rgba(4,15,27,.2);opacity:.88;
-    font-size:0;line-height:0;letter-spacing:0}
-  nav button kbd::before{content:'';box-sizing:border-box;width:4px;height:8px;border:1.5px solid currentColor}
-  nav button kbd.kl::before{border-right:0}
-  nav button kbd.kr::before{border-left:0}
+  nav button .nm{display:inline-flex;align-items:center;gap:7px}
+  nav button .nm::before,nav button .nm::after{content:'';box-sizing:border-box;flex:0 0 auto;width:4px;height:13px;border:1.5px solid currentColor;opacity:.85}
+  nav button .nm::before{border-right:0}
+  nav button .nm::after{border-left:0;margin-left:-.085em}
   nav button .ld{position:absolute;left:4px;top:50%;width:4px;height:4px;margin-top:-2px;border-radius:50%;background:currentColor;opacity:0;transition:opacity .2s}
   nav button.loading .ld{opacity:.7;animation:blink .8s infinite}
   @keyframes blink{50%{opacity:.15}}
@@ -1427,8 +1425,8 @@ SHELL_HTML = r"""<!doctype html>
   @media (max-width:1580px){.flow{display:none}}
   @media (max-width:1340px){.tick{display:none}.wm small{display:none}header{gap:8px}}
   @media (max-width:980px){.market-time{display:none}}
-  @media (max-width:760px){header{gap:7px;padding:0 8px}.wm,.sep{display:none}nav button{padding:4px 8px}nav button kbd{display:none}.tick{gap:7px;padding:0 8px}.flow{gap:5px;padding-left:8px}.bar{width:48px}}
-  @media (max-width:520px){.tick{height:32px;gap:6px}.sym em{display:none}.px{min-width:66px;font-size:12px}.chg{font-size:9px;padding:3px 5px}nav button{font-size:9px;padding:3px 6px}.ib{width:29px;height:29px}}
+  @media (max-width:760px){header{gap:7px;padding:0 8px}.wm,.sep{display:none}nav button{padding:4px 8px}nav button .nm{gap:5px}.tick{gap:7px;padding:0 8px}.flow{gap:5px;padding-left:8px}.bar{width:48px}}
+  @media (max-width:520px){.tick{height:32px;gap:6px}.sym em{display:none}.px{min-width:66px;font-size:12px}.chg{font-size:9px;padding:3px 5px}nav button{font-size:9px;padding:3px 5px}nav button .nm{gap:3px}nav button .nm::before,nav button .nm::after{width:3px;height:10px;border-width:1.2px}.ib{width:29px;height:29px}}
   @media (prefers-reduced-motion:reduce){header::after,.brand .otm-dot,.brand svg .otm-orbit-a,.brand svg .otm-orbit-b,.tdot.on,.dot.open{animation:none}}
 </style></head>
 <body><div id="shell">
@@ -1437,8 +1435,8 @@ SHELL_HTML = r"""<!doctype html>
     <span class="sep"></span>
     <nav id="tabs" class="noanim" role="tablist">
       <i class="ink"></i>
-      <button role="tab" data-v="fakemove">CHART<i class="ld"></i><kbd class="kl" aria-hidden="true">[</kbd></button>
-      <button role="tab" data-v="footprint">FOOTPRINT<i class="ld"></i><kbd class="kr" aria-hidden="true">]</kbd></button>
+      <button role="tab" data-v="fakemove"><span class="nm">CHART</span><i class="ld"></i></button>
+      <button role="tab" data-v="footprint"><span class="nm">FOOTPRINT</span><i class="ld"></i></button>
     </nav>
     <div class="tick" id="tick">
       <span class="sym"><i class="tdot" id="tlive"></i>BTC<em>PERP</em></span>
